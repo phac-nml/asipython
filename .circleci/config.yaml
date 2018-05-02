@@ -7,9 +7,4 @@ jobs:
       - image: themattrix/tox
     steps:
       - checkout
-      - run:
-					name: run tests
-					command: tox
-      - run:
-					name: run flake8
-					command: tox -e flake8
+      - run: tox
