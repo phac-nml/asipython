@@ -2,8 +2,11 @@
 
 from types import StringType
 
-from Asi.grammar.node import *
+from Asi.grammar.node import EOF, TAminoAcid, TAnd, TAtleast, TBlank, TComma, TExactly, \
+                             TExclude, TFloat, TFrom, TInteger, TLPar, TMapper, TMax, TMin, \
+                             TNot, TNotmorethan, TOr, TRPar, TScore, TSelect
 from Asi.grammar.utils import PushbackReader, StringBuffer
+
 
 class LexerException(Exception):
     def __init__(self, value):
@@ -11,12 +14,13 @@ class LexerException(Exception):
 
     def __str__(self):
         return self.value
-        
+
+
 # lexer states
 STATE_INITIAL = 0
 
 accept_tokens = [None] * 20
-        
+
 accept_tokens[0] = lambda line, pos: TMin(line, pos)
 accept_tokens[1] = lambda line, pos: TAnd(line, pos)
 accept_tokens[2] = lambda line, pos: TOr(line, pos)
@@ -293,18 +297,24 @@ lexer_gotoTable = [
                       [
                       ],
                     ],
-                  ] 
-                
+                  ]
+
 accept_table = [
                  [
-                   -1, 16, 16, 16, 16, 12, 13, 15, 0, 17, -1, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, -1, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, -1, 14, -1, -1, -1, -1, -1, -1, 2, -1, -1, 18, 1, -1, -1, -1, -1, 11, 3, -1, -1, -1, -1, -1, 6, -1, -1, -1, -1, -1, -1, -1, 10, -1, -1, -1, -1, -1, 5, 7, 8, 4, -1, -1, -1, -1, 9, 
+                   -1, 16, 16, 16, 16, 12, 13, 15, 0, 17, -1, 19, 19, 19, 19,
+                   19, 19, 19, 19, 19, 19, 19, 19, -1, 19, 19, 19, 19, 19, 19,
+                   19, 19, 19, 19, 19, -1, 14, -1, -1, -1, -1, -1, -1, 2, -1,
+                   -1, 18, 1, -1, -1, -1, -1, 11, 3, -1, -1, -1, -1, -1, 6, -1,
+                   -1, -1, -1, -1, -1, -1, 10, -1, -1, -1, -1, -1, 5, 7, 8, 4,
+                   -1, -1, -1, -1, 9,
                  ],
                ]
-             
+
+
 class Lexer(object):
     def __init__(self, source):
         if isinstance(source, StringType):
-            self.reader = PushbackReader(file(source, "r"))
+            self.reader = PushbackReader(open(source, "r"))
         else:
             self.reader = PushbackReader(source)
 
@@ -320,13 +330,13 @@ class Lexer(object):
         pass
 
     def peek(self):
-        while(self.token == None):
+        while self.token is None:
             self.token = self.getToken()
             self.filter()
         return self.token
 
     def next(self):
-        while (self.token == None):
+        while self.token is None:
             self.token = self.getToken()
             self.filter()
 
@@ -353,14 +363,14 @@ class Lexer(object):
         while 1:
             c = self.getChar()
 
-            if(c != -1):
-                if (c == 10):
+            if c != -1:
+                if c == 10:
                     if(self.cr):
                         self.cr = False
                     else:
                         self.line = self.line + 1
                         self.pos = 0
-                elif (c == 13):
+                elif c == 13:
                     self.line = self.line + 1
                     self.pos = 0
                     self.cr = True
@@ -369,20 +379,20 @@ class Lexer(object):
                     self.cr = False
 
                 text.append(chr(c))
-                
+
                 while 1:
-                    if (dfa_state < -1):
-                        oldState = (-2 -dfa_state)
+                    if dfa_state < -1:
+                        oldState = -2 - dfa_state
                     else:
                         oldState = dfa_state
 
                     dfa_state = -1
 
-                    tmp1 =  gotoTable[oldState]
+                    tmp1 = gotoTable[oldState]
                     low = 0
                     high = len(tmp1) - 1
 
-                    while (low <= high):
+                    while low <= high:
                         middle = (low + high) / 2
                         tmp2 = tmp1[middle]
 
@@ -394,46 +404,48 @@ class Lexer(object):
                             dfa_state = tmp2[2]
                             break
                     if (dfa_state >= -1):
-                    	break
+                        break
             else:
                 dfa_state = -1
 
-            if (dfa_state >= 0):
-                if (accept[dfa_state] != -1):
+            if dfa_state >= 0:
+                if accept[dfa_state] != -1:
                     accept_state = dfa_state
                     accept_token = accept[dfa_state]
                     accept_length = len(text)
                     accept_pos = self.pos
                     accept_line = self.line
             else:
-                if (accept_state != -1):
-                    if (accept_token >= 0 and accept_token <= 19):
-                    	token = accept_tokens[accept_token](start_line + 1, start_pos + 1)
-                    	if token.getText() == None:
-                    	    token.setText(self.getText(accept_length))
-                    	
+                if accept_state != -1:
+                    if accept_token >= 0 and accept_token <= 19:
+                        token = accept_tokens[accept_token](start_line + 1, start_pos + 1)
+                        if token.getText() is None:
+                            token.setText(self.getText(accept_length))
+
                         self.pushBack(accept_length)
                         self.pos = accept_pos
                         self.line = accept_line
-                      
+
                         return token
                 else:
-                    if (len(text) > 0):
-                        raise LexerException("[" + str(start_line + 1) + "," + str(start_pos + 1) + "]" +" Unknown token: " + str(text))
+                    if len(text) > 0:
+                        raise LexerException("[" + str(start_line + 1) + ","
+                                             + str(start_pos + 1) + "]"
+                                             + " Unknown token: " + str(text))
                     else:
                         return EOF(start_line + 1, start_pos + 1)
 
     def getChar(self):
-        if (self.eof):
+        if self.eof:
             return -1
         c = self.reader.read()
-        
-        if (c == ""):
+
+        if c == "":
             result = -1
         else:
             result = ord(c)
 
-        if(result == -1):
+        if result == -1:
             self.eof = True
 
         return result
