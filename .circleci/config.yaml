@@ -1,0 +1,15 @@
+version: 2
+
+jobs:
+  build:
+    working_directory: ~/your_thing
+    docker:
+      - image: themattrix/tox
+    steps:
+      - checkout
+      - run:
+					name: run tests
+					command: tox
+      - run:
+					name: run flake8
+					command: tox -e flake8
