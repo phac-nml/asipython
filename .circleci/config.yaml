@@ -5,6 +5,8 @@ jobs:
     working_directory: ~/asipython
     docker:
       - image: themattrix/tox
+    environment:
+      TOXBUILD: true
     steps:
       - checkout
       - run: tox
