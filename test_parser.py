@@ -13,10 +13,10 @@ class TreePrinter(ReversedDepthFirstAdapter):
         self.indentchar = Stack()
         self.last = False
 
-    def outStart(self, node):
-        print "\n" + self.output[3:] + "\n" 
+    def out_start(self, node):
+        print("\n" + self.output[3:] + "\n")
 
-    def defaultIn(self, node):
+    def default_in(self, node):
         if (self.last):
             self.indentchar.push('`')
         else:
@@ -25,32 +25,32 @@ class TreePrinter(ReversedDepthFirstAdapter):
         self.indent = self.indent + "   "
         self.last = True
 
-    def defaultOut(self, node):
+    def default_out(self, node):
         self.indent = self.indent[0 : len(self.indent) - 3]
         self.indent = self.indent[0 : len(self.indent) - 1] + self.indentchar.peek()
         self.indentchar.pop()
         self.output = self.indent + "- " + node.__class__.__name__ + "\n" + self.output
         self.indent = self.indent[0 : len(self.indent) - 1] + "|"
 
-    def defaultCase(self, node):
+    def default_case(self, node):
         if (self.last):
             self.indent = self.indent[0 : len(self.indent) - 1] + "`"
 
-        self.output = self.indent + "- " + node.getText() + "\n" + self.output
+        self.output = self.indent + "- " + node.get_text() + "\n" + self.output
  
         self.indent = self.indent[0 : len(self.indent) - 1] + "|"
 
         self.last = False
 
-    def caseEOF(self, node):
+    def case_eof(self, node):
         self.last = False
 
 def main():
     if len(sys.argv) < 2:
-        print "usage:"
-        print "    python test_parser.py <filename>"
+        print("usage:")
+        print("    python test_parser.py <filename>")
     else:
-        f = file(sys.argv[1], "r")
+        f = open(sys.argv[1], "r")
         _lexer = Lexer(f)
         _parser = Parser(_lexer)
         start = _parser.parse()

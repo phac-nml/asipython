@@ -2,22 +2,22 @@
 
 import sys
 from Asi.grammar.lexer import Lexer
-from Asi.grammar.nodes import EOF
+from Asi.grammar.node import EOF
 
 def main():
     if len(sys.argv) != 2:
-        print "usage:"
-        print "    python testlexer.py <filename>"
+        print("usage:")
+        print("    python testlexer.py <filename>")
     else:
-        f = file(sys.argv[1], "r")
+        f = open(sys.argv[1], "r")
         _lexer = Lexer(f)
 
         while 1:
             token = _lexer.next()
-            print "Read token '" + token.__class__.__name__ + "'" + ", text = [" + token.getText() + "] at [" + str(token.getLine()) + "," + str(token.getPos()) + "]"
-            if isinstance(token, EOF): 
+            print("Read token '" + token.__class__.__name__ + "'" + ", text = [" + token.get_text() + "] at [" + str(token.get_line()) + "," + str(token.get_pos()) + "]")
+            if isinstance(token, EOF):
                 break
         f.close()
 
 if __name__ == '__main__':
-    main()            
+    main()
