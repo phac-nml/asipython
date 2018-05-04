@@ -362,7 +362,7 @@ class Lexer(object):
         text = self.text
         text.clear()
 
-        while 1:
+        while True:
             char = self.get_char()
 
             if char != -1:
@@ -382,7 +382,7 @@ class Lexer(object):
 
                 text.append(chr(char))
 
-                while 1:
+                while True:
                     if dfa_state < -1:
                         old_state = -2 - dfa_state
                     else:

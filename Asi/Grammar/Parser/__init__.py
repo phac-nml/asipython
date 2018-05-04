@@ -1281,7 +1281,7 @@ class Parser(object):
         last_token = None
         action = [0, 0]
 
-        while 1:
+        while True:
             while lexer.peek().TokenIndex == -1:
                 lexer.next()
 
