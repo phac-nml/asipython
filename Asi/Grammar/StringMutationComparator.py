@@ -28,21 +28,25 @@ class StringMutationComparator:
     def __init__(self, strict_comparison):
         self.strict_comparison = strict_comparison
 
-    def compare(self, object1, object2):
-        """Compares two mutations, to see if
+    def compare(self, mutation1, mutation2):
+        """Compares two mutations, and returns 1 for a match and 0 for a mismatch.
+        If self.strict_comparison equals TRUE, then mutations must be identical.
+        If self.strict_comparison equals FALSE, then mutation2 must contain a subset of mutation1.
 
-        Args:
-            object1:
-            object2:
+        Parameters
+        ----------
+        mutation1 : mutation from rule
+        mutation2 : mutation to query
 
         Returns:
             int: 1 for match, 0 for mismatch.
         """
-        result1 = self.MUTATION_PATTERN.match(str(object1))
-        result2 = self.MUTATION_PATTERN.match(str(object2))
+        result1 = self.MUTATION_PATTERN.match(str(mutation1))
+        result2 = self.MUTATION_PATTERN.match(str(mutation2))
 
         if result1 is None or result2 is None:
-            raise RuntimeError("Invalid String formatted mutations: %s, %s" % (object1, object2))
+            raise RuntimeError("Invalid String formatted mutations: %s, %s"
+                               % (mutation1, mutation2))
 
         codon1 = int(result1.group(self.CODON_GROUP))
         codon2 = int(result2.group(self.CODON_GROUP))

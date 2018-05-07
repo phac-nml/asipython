@@ -141,7 +141,7 @@ class AsiGrammarAdapter(DepthFirstAdapter):
 
     def case_aatleastnotmorethanselectstatement2(self, node):
         """On the top of the Stack is the value of how many elements are evaluated to TRUE.
-        It compares the top of the Stack with teh ATLEAST attribute AND/OR the NOTMORETHAN
+        It compares the top of the Stack with the ATLEAST attribute AND/OR the NOTMORETHAN
         attribute. If comparison is evaluated to TRUE, push TRUE otherwise push FALSE.
         """
         super().case_aatleastnotmorethanselectstatement2(node)
@@ -237,25 +237,13 @@ class AsiGrammarAdapter(DepthFirstAdapter):
         return 0 if max_value == float('-infinity') else max_value
 
 
-class ScoredItem:
-    """TODO: fillme"""
+class ScoredItem(object):
+    """Object used to store a ScoredItem"""
     def __init__(self, value, mutations, score):
         self.value = value
         self.mutations = mutations
         self.score = score
 
-    def get_value(self):
-        """TODO: fillme"""
-        return self.value
-
-    def get_mutations(self):
-        """TODO: fillme"""
-        return self.mutations
-
-    def get_score(self):
-        """TODO: fillme"""
-        return self.score
-
     def __str__(self):
-        """TODO: fillme"""
+        """Returns a string representing the ScoredItem."""
         return self.value
