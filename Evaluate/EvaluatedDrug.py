@@ -16,6 +16,7 @@ specific language governing permissions and limitations under the License.
 """
 
 from Asi.Definition.LevelDefinitionComparator import LevelDefinitionComparator
+from Asi.Definition.Drug import Drug
 
 
 class EvaluatedDrug(object):
@@ -23,6 +24,8 @@ class EvaluatedDrug(object):
     FORMAT = "{Drug: %s, Scored Mutations: %s, Level: %s, Comments: %s}"
 
     def __init__(self, drug, evaluated_conditions):
+        if not isinstance(drug, Drug):
+            raise TypeError("drug param must be of Drug type")
         self.drug = drug
         self.scored_mutations = set()
         self.level_definitions = set()
@@ -41,6 +44,10 @@ class EvaluatedDrug(object):
                     self.level_definitions.add(definition)
                 elif hasattr(definition, 'identifier'):  # comment definition
                     self.comment_definitions.add(definition)
+                else:
+                    raise TypeError("Unexpected attribute found for %s expected " +
+                                    "to be of type LevelDefinition or CommentDefinition"
+                                    % definition)
 
     def get_evaluated_conditions(self):
         return self.evaluated_conditions
