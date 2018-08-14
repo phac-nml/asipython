@@ -27,7 +27,7 @@ class RuleCondition(object):
 
     def __init__(self, statement):
         self.statement = statement
-        parser = Parser(Lexer(StringIO(statement)))
+        parser = Parser(Lexer(StringIO(str(statement))))
         try:
             self.condition_tree = parser.parse()
         except Exception:
