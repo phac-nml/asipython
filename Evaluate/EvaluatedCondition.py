@@ -15,19 +15,19 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
 
-import Asi.Definition.RuleCondition
-import Asi.Grammar.AsiGrammarAdapter
 
 class EvaluatedCondition(object):
 
     FORMAT = "%sstatement: %s,%sdefinitions: %s}"
 
     def __init__(self, rule_condition, evaluator):
+        """Requires a RuleCondition and AsiGrammarAdapter object"""
+
         self.rule_condition = rule_condition
         self.evaluator = evaluator
         self.definitions = set()
 
-    def add_definition(definition):
+    def add_definition(self, definition):
         if definition:
             self.definitions.add(definition)
 
