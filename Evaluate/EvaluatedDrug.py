@@ -16,7 +16,6 @@ specific language governing permissions and limitations under the License.
 """
 
 from Asi.Definition.LevelDefinitionComparator import LevelDefinitionComparator
-from Asi.Definition.Drug import Drug
 
 
 class EvaluatedDrug(object):
@@ -24,8 +23,6 @@ class EvaluatedDrug(object):
     FORMAT = "{Drug: %s, Scored Mutations: %s, Level: %s, Comments: %s}"
 
     def __init__(self, drug, evaluated_conditions):
-        if not isinstance(drug, Drug):
-            raise TypeError("drug param must be of Drug type")
         self.drug = drug
         self.scored_mutations = set()
         self.level_definitions = set()
