@@ -16,11 +16,11 @@ specific language governing permissions and limitations under the License.
 """
 
 import Asi.Definition.RuleCondition
-import Asi.Grammar.AsiGrammarEvaluator
+import Asi.Grammar.AsiGrammarAdapter
 
 class EvaluatedCondition(object):
 
-    FORMAT = "{0}statement: {1},{0}definitions: {2}'}'"
+    FORMAT = "%sstatement: %s,%sdefinitions: %s}"
 
     def __init__(self, rule_condition, evaluator):
         self.rule_condition = rule_condition
@@ -41,4 +41,7 @@ class EvaluatedCondition(object):
         return self.definitions
 
     def __str__(self):
-        return FORMAT.format("\n\t\t", self.rule_condition, self.definitions)
+        return self.FORMAT % ("\n\t\t",
+                              self.rule_condition,
+                              "\n\t\t",
+                              self.definitions)

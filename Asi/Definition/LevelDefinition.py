@@ -17,7 +17,7 @@ specific language governing permissions and limitations under the License.
 
 
 class LevelDefinition(object):
-    FORMAT = "'{'order: %i, text: %s, sir: %s'}'"
+    FORMAT = "{order: %i, text: %s, sir: %s}"
 
     def __init__(self, order, text, sir):
         self.order = order

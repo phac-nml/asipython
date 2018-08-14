@@ -17,7 +17,7 @@ specific language governing permissions and limitations under the License.
 
 
 class CommentDefinition(object):
-    FORMAT = "'{'id: %s, text: %s, sort: %d'}'"
+    FORMAT = "{id: %s, text: %s, sort: %d}"
 
     def __init__(self, identifier, text, sort=None):
         self.id = identifier
@@ -30,7 +30,7 @@ class CommentDefinition(object):
     def get_text(self):
         return self.text
 
-    def get_scort(self):
+    def get_sort(self):
         return self.sort
 
     def get_resistance(self):
