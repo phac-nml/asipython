@@ -15,10 +15,8 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
 
-import Asi.Definition.CommentDefinition
-import Asi.Definition.Drug
-import Asi.Definition.LevelDefinition
-import Asi.Definition.LevelDefinitionComparator
+from Asi.Definition.LevelDefinitionComparator import LevelDefinitionComparator
+
 
 class EvaluatedDrug(object):
 
@@ -45,7 +43,7 @@ class EvaluatedDrug(object):
                     self.comment_definitions.add(definition)
 
     def get_evaluated_conditions(self):
-        return self.evaluated_conditions;
+        return self.evaluated_conditions
 
     def get_highest_level_definition(self):
         return max(self.level_definitions, key=LevelDefinitionComparator.compare()) \
@@ -63,11 +61,9 @@ class EvaluatedDrug(object):
     def get_drug(self):
         return self.drug
 
-    def to_string(self):
-        highest_level_definition = self.get_highest_level_definition()
-        level_def == "" if highest_level_definition is None else \
-                     str(highest_level_definition)
+    def __str__(self):
+        highest_lev_def = self.get_highest_level_definition()
         return self.FORMAT % (self.drug,
                               self.scored_mutations,
-                              level_def,
+                              str(highest_lev_def) if highest_lev_def is not None else "",
                               self.comment_definitions)
