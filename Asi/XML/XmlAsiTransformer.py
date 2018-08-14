@@ -21,6 +21,7 @@ from Asi.AsiParsingException import AsiParsingException
 from Asi.Definition.LevelDefinition import LevelDefinition
 from Asi.Definition.CommentDefinition import CommentDefinition
 from Asi.Definition.RangeValue import RangeValue
+from Asi.Definition.Drug import Drug
 
 
 class XmlAsiTransformer:
@@ -91,7 +92,7 @@ class XmlAsiTransformer:
 
         global_node = root.find(self.GLOBAL_RANGE_XPATH)
         global_range = self.parse_score_range(global_node.text.strip(), levels) \
-                       if global_node is not None else None
+            if global_node is not None else None
 
         gene_names = set()
 
