@@ -18,7 +18,7 @@ specific language governing permissions and limitations under the License.
 from Asi.AsiEvaluationException import AsiEvaluationException
 
 
-class CommemtAction(object):
+class CommentAction(object):
 
     def __init__(self, comment):
         """Requires a CommentDefinition object"""
