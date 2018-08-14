@@ -24,21 +24,20 @@ from Asi import AsiParsingException
 
 
 class RuleCondition(object):
-    DEFAULT_BUFFER_SIZE = 1024
 
     def __init__(self, statement):
         self.statement = statement
         parser = Parser(Lexer(StringIO(statement)))
         try:
             self.condition_tree = parser.parse()
-        except:
-            raise ASIParsingException("Invalid condition statement: " + statement)
+        except Exception:
+            raise AsiParsingException("Invalid condition statement: " + statement)
 
     def getStatement(self):
         return self.statement
 
-    def evaluate(mutations, comparator):
-        adapter = new AsiGrammarAdapter(mutations, comparator)
+    def evaluate(self, mutations, comparator):
+        adapter = AsiGrammarAdapter(mutations, comparator)
         self.condition_tree.apply(adapter)
         return EvaluatedCondition(self, adapter)
 
