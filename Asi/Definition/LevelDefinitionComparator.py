@@ -15,15 +15,11 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
 
-import Asi.Definition.LevelDefinition
-
 
 class LevelDefinitionComparator(object):
 
     @classmethod
-    def compare(cls, obj1, obj2):
-        level1 = (LevelDefinition) obj1
-        level2 = (LevelDefinition) obj2
-
+    def compare(cls, level1, level2):
+        """Compares two LevelDefinition objects"""
         return ((level1.get_order() > level2.get_order()) -
                 (level1.get_order() < level2.get_order()))
