@@ -24,7 +24,8 @@ from Asi.Definition.RangeValue import RangeValue
 
 
 class XmlAsiTransformer:
-    SCORE_RANGE_PATTERN = re.compile("(-INF|\\d+(?:\\.\\d+)?)\\s*TO\\s*(INF|\\d+(?:\\.\\d+)?)\\s*=>\\s*(\\d+)")
+    SCORE_RANGE_PATTERN = \
+        re.compile("(-INF|\\d+(?:\\.\\d+)?)\\s*TO\\s*(INF|\\d+(?:\\.\\d+)?)\\s*=>\\s*(\\d+)")
 
     GENE_DEFINITION_XPATH = "/ALGORITHM/DEFINITIONS/GENE_DEFINITION"
     GENE_DEFINITION_NAME_XPATH = "NAME"
@@ -84,17 +85,17 @@ class XmlAsiTransformer:
 
             if dtd is None or not dtd.validate(root):
                 raise AsiParsingException("Not a Stanford resistance analysis XML file")
-        
+
         levels = self.create_level_dict(root)
         comments = self.create_comment_dict(root)
 
         global_node = root.find(self.GLOBAL_RANGE_XPATH)
-        global_range = self.parse_score_range(global_node.text.strip(), levels) if global_node is not None else None
+        global_range = self.parse_score_range(global_node.text.strip(), levels) \
+                       if global_node is not None else None
 
         gene_names = set()
 
         genes = {}
-
 
         return genes
 
