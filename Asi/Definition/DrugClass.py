@@ -15,6 +15,7 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
 
+from Asi.AsiEvaluationException import AsiEvaluationException
 from Asi.Evaluate.EvaluatedDrugClass import EvaluatedDrugClass
 
 
@@ -34,10 +35,11 @@ class DrugClass(object):
         return self.name
 
     def evaluate(self, mutations, comparator):
+        """Requires a list of mutations and a MutationComparator"""
         evaluated_drugs = list()
         for drug in self.drugs:
             try:
                 evaluated_drugs.add(drug.evaluate(mutations, comparator))
-            except Exception as e:
-                raise("Exception occured on line 39 of DrugClass.py:\n%s" % e)
+            except AsiEvaluationException:
+                raise
         return EvaluatedDrugClass(self, evaluated_drugs)

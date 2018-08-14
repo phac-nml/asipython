@@ -15,6 +15,9 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
 
+from Asi.AsiEvaluationException import AsiEvaluationException
+from Asi.Evaluate.EvaluatedDrug import EvaluatedDrug
+
 
 class Drug:
 
@@ -22,3 +25,25 @@ class Drug:
         self.name = name
         self.full_name = full_name
         self.rules = rules
+
+    def get_drug_name(self):
+        return self.name
+
+    def get_drug_full_name(self):
+        return self.full_name
+
+    def get_drug_rules(self):
+        return self.drug_rules
+
+    def evaluate(self, mutations, comparator):
+        """Requires a list of mutations and a MutationComparator"""
+        evaluated_conditions = list()
+        for rule in self.drug_rules:
+            try:
+                evaluated_conditions.add(rule.evaluate(mutations, comparator))
+            except AsiEvaluationException:
+                raise
+        return EvaluatedDrug(self, evaluated_conditions)
+
+    def __str__(self):
+        return self.name

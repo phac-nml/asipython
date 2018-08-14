@@ -38,7 +38,10 @@ class RuleCondition(object):
 
     def evaluate(self, mutations, comparator):
         adapter = AsiGrammarAdapter(mutations, comparator)
-        self.condition_tree.apply(adapter)
+        try:
+            self.condition_tree.apply(adapter)
+        except AsiParsingException:
+            raise
         return EvaluatedCondition(self, adapter)
 
     def __str__(self):

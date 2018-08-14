@@ -236,6 +236,9 @@ class AsiGrammarAdapter(DepthFirstAdapter):
 
         return 0 if max_value == float('-infinity') else max_value
 
+    def get_scored_mutations(self):
+        return self.all_scored_mutations
+
 
 class ScoredItem(object):
     """Object used to store a ScoredItem"""
