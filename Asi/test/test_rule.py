@@ -51,10 +51,11 @@ class TestRule:
             raise Exception("Mutations are not valid %s" % cls.mutations_string)
 
     def test_missing_required_rule_elements(self):
-        """A rule is missing the condition for DLV drug"""
+        """Test when a rule is missing the condition for DLV drug"""
         try:
             transformer = XmlAsiTransformer(self.validate_xml)
-            transformer.transform(open(os.path.join(self.module_path,"test/data/HIVDB_missingCondition.xml"), "r"))
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_missingCondition.xml"), "r")
+            transformer.transform(fd)
         except AsiParsingException as e:
             print("CONDITION tag is a required element:\n\t%s" % str(e))
             try:
@@ -66,10 +67,13 @@ class TestRule:
         except Exception as exc:
             print("ex:%s" % str(exc))
             raise exc
+        finally:
+            fd.close()
 
         try:
             transformer = XmlAsiTransformer(self.validate_xml)
-            transformer.transform(open(os.path.join(self.module_path,"test/data/HIVDB_missingActions.xml"), "r"))
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_missingActions.xml"), "r")
+            transformer.transform(fd)
         except AsiParsingException as e:
             print("ACTIONS tag is a required element:\n\t%s" % str(e))
             try:
@@ -81,3 +85,24 @@ class TestRule:
         except Exception as exc:
             print("ex:%s" % str(exc))
             raise exc
+        finally:
+            fd.close()
+
+    def test_required_global_range(self):
+        try:
+            transformer = XmlAsiTransformer(self.validate_xml)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_missingRequiredGlobalRange.xml"), "r")
+            transformer.transform(fd)
+        except AsiParsingException as e:
+            print("GLOBALRANGE tag is a required element (some rules are using USE_GLOBALRANGE tag):\n\t" + str(e))
+            try:
+                actual_err_message = str(e).index("required global range does not exist")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "required global range does not exist\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("ex:%s" % str(exc))
+            raise exc
+        finally:
+            fd.close()

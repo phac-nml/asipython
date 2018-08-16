@@ -40,7 +40,7 @@ class Drug:
         evaluated_conditions = list()
         for rule in self.drug_rules:
             try:
-                evaluated_conditions.add(rule.evaluate(mutations, comparator))
+                evaluated_conditions.append(rule.evaluate(mutations, comparator))
             except AsiEvaluationException:
                 raise
         return EvaluatedDrug(self, evaluated_conditions)

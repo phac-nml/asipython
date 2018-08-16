@@ -55,14 +55,14 @@ class Gene(object):
         evaluated_gene_rules = list()
         for gene_rule in self.gene_rules:
             try:
-                evaluated_gene_rules.add(gene_rule.evaluate(mutations, comparator))
+                evaluated_gene_rules.append(gene_rule.evaluate(mutations, comparator))
             except AsiEvaluationException:
                 raise
 
         evaluated_drug_classes = list()
         for drug_class in self.drug_classes:
             try:
-                evaluated_drug_classes.add(drug_class.evaluate(mutations, comparator))
+                evaluated_drug_classes.append(drug_class.evaluate(mutations, comparator))
             except AsiEvaluationException:
                 raise
 

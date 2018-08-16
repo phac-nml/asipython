@@ -39,7 +39,7 @@ class DrugClass(object):
         evaluated_drugs = list()
         for drug in self.drugs:
             try:
-                evaluated_drugs.add(drug.evaluate(mutations, comparator))
+                evaluated_drugs.append(drug.evaluate(mutations, comparator))
             except AsiEvaluationException:
                 raise
         return EvaluatedDrugClass(self, evaluated_drugs)

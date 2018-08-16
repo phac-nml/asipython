@@ -1,7 +1,7 @@
 """
 Copyright Government of Canada 2018
 
-Written by: Eric Enns, National Microbiology Laboratory, Public Health Agency of Canada
+Written by: Eric Enns and Matthew Fogel, National Microbiology Laboratory, Public Health Agency of Canada
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this work except in compliance with the License. You may obtain a copy of the
@@ -22,6 +22,7 @@ from Asi.Definition.LevelDefinition import LevelDefinition
 from Asi.Definition.CommentDefinition import CommentDefinition
 from Asi.Definition.RangeValue import RangeValue
 from Asi.Definition.Drug import Drug
+from Asi.Definition.RuleCondition import RuleCondition
 
 
 class XmlAsiTransformer:
@@ -41,7 +42,7 @@ class XmlAsiTransformer:
     LEVEL_SIR_XPATH = "SIR"
 
     COMMENT_XPATH = "/ALGORITHM/DEFINITIONS/COMMENT_DEFINITIONS/COMMENT_STRING"
-    COMMENT_ID_XPATH = "@id"
+    COMMENT_ID_XPATH = "id"
     COMMENT_TEXT_XPATH = "TEXT"
     COMMENT_SORT_XPATH = "SORT_TAG"
 
@@ -71,20 +72,19 @@ class XmlAsiTransformer:
 
     def transform(self, asi_xml_file):
         root = etree.parse(asi_xml_file)
-
         if self.validate_xml:
             schema = root.docinfo.internalDTD.system_url
             dtd = None
 
             module_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            if schema.split('/')[-1] == '/ASI.dtd':
+            if schema.split('/')[-1] == 'ASI.dtd':
                 dtd = etree.DTD(open(os.path.join(module_path, "ASI.dtd")))
-            elif schema.split('/')[-1] == '/ASI2.dtd':
+            elif schema.split('/')[-1] == 'ASI2.dtd':
                 dtd = etree.DTD(open(os.path.join(module_path, "ASI2.dtd")))
-            elif schema.split('/')[-1] == '/ASI2.1.dtd':
+            elif schema.split('/')[-1] == 'ASI2.1.dtd':
                 dtd = etree.DTD(open(os.path.join(module_path, "ASI2.1.dtd")))
 
-            if dtd is None or not dtd.validate(root):
+            if dtd is None or dtd.validate(root):
                 raise AsiParsingException("Not a Stanford resistance analysis XML file")
 
         levels = self.create_level_dict(root)
@@ -93,6 +93,7 @@ class XmlAsiTransformer:
         global_node = root.find(self.GLOBAL_RANGE_XPATH)
         global_range = self.parse_score_range(global_node.text.strip(), levels) \
             if global_node is not None else None
+        drugs = self.parse_drugs(root, levels, comments, global_range)
 
         gene_names = set()
 
@@ -120,7 +121,7 @@ class XmlAsiTransformer:
         comments = {}
 
         for node in nodes:
-            comment_id = node.find(self.COMMENT_ID_XPATH).text.strip()
+            comment_id = node.get(self.COMMENT_ID_XPATH)
             text = node.find(self.COMMENT_TEXT_XPATH).text.strip()
             sort = node.find(self.COMMENT_SORT_XPATH).text
 
@@ -155,7 +156,6 @@ class XmlAsiTransformer:
 
     def parse_drugs(self, root, levels, comments, global_range):
         drugs = {}
-
         drug_nodes = root.xpath(self.DRUG_XPATH)
         for drug in drug_nodes:
             drug_name = drug.find(self.DRUG_NAME_XPATH).text.strip()
@@ -172,8 +172,47 @@ class XmlAsiTransformer:
 
     def parse_rules(self, rule_nodes, levels, comments, global_range):
         drug_rules = []
-
         for rule in rule_nodes:
-            condition = None
+            condition = RuleCondition(rule.find(self.RULE_CONDITION_XPATH).text.strip())
+            rule_actions = list()
+            # attempt to retrieve all of the possible action nodes
+            # (e.g. comment, score range, level)
+            comment_node = self.select_unique_single_node(rule, self.RULE_COMMENT_XPATH)
+            level_node = self.select_unique_single_node(rule, self.RULE_LEVEL_XPATH)
+            score_range_node = self.select_unique_single_node(rule, self.RULE_SCORERANGE_XPATH)
+
+            if comment_node is not None:
+                definition = self.get_required_definition(comments, comment_node)
+                rule_actions.append(CommentAction(definition))
+            if level_node is not None:
+                definition = self.get_required_definition(levels, level_node)
+                rule_actions.append(LevelAction(definition))
+            if score_range_node is not None:
+                # If a global range reference exists map to the global range else parse outa  new range
+                score_range = list()
+                if len(score_range_node.xpath(self.RULE_USE_GLOBALRANGE_PATH)) == 1:
+                    if len(global_range) == 0:
+                        raise AsiParsingException("required global range does not exist: " + score_range_node)
+                    score_range = global_range
+                else:
+                    score_range = self.parse_score_range(score_range_node.text.strip(), levels)
+                rule_actions.append(ScoreRangeAction(score_range))
+            if comment_node is None and level_node is None and score_range_node is None:
+                raise AsiParsingException("no action exists for rule: " + rule + "/ \n" + condition.get_statement())
+            drug_rules.append(Rule(condition, rule_actions))
 
         return drug_rules
+
+    def select_unique_single_node(self, parent, xpath):
+        nodes = parent.xpath(xpath)
+        if len(nodes) > 1:
+            raise AsiParsingException("unique node: " + xpath + ", does not exist within parent: " + parent)
+
+        return None if len(nodes) == 0 else nodes.get(0)
+
+    def get_required_definition(self, definitions, key):
+        obj = definitions.get(str(key)).strip()
+        if obj is None:
+            raise AsiParsingException("required definition: " + key + " does not exist.")
+        #return the new Definition
+        return obj
