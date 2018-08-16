@@ -14,7 +14,10 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
+
+import os
 from Asi.Definition.Rule import Rule
+from Asi.AsiParsingException import AsiParsingException
 from Asi.AsiEvaluationException import AsiEvaluationException
 from Asi.Definition.CommentAction import CommentAction
 from Asi.Definition.CommentDefinition import CommentDefinition
@@ -29,7 +32,7 @@ from Asi.Grammar.StringMutationComparator import StringMutationComparator
 from Asi.XML.XmlAsiTransformer import XmlAsiTransformer
 
 
-class RuleTest:
+class TestRule:
 
     @classmethod
     def setup_class(cls):
@@ -38,6 +41,43 @@ class RuleTest:
         cls.gene_name = "RT"
         cls.mutation_comparator = StringMutationComparator(cls.strict_comparison)
         cls.mutation_list = "41L,75MA,98G,100I,90M"
-        cls.mutations = (cls.mutations_list).split(",")
-        if not cls.mutation_comparator.are_mutations_valid(cls.mutations):
-            raise Exception("Mutations are not valid %s" % cls.mutations_list)
+        cls.set_mutations(cls, cls.mutation_list, cls.mutation_comparator)
+        cls.module_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    def set_mutations(cls, mutations_string, comparator):
+        """Requires string MutataionsString and MutationComparator"""
+        cls.mutations = mutations_string.split(",")
+        if not comparator.are_mutations_valid(cls.mutations):
+            raise Exception("Mutations are not valid %s" % cls.mutations_string)
+
+    def test_missing_required_rule_elements(self):
+        """A rule is missing the condition for DLV drug"""
+        try:
+            transformer = XmlAsiTransformer(self.validate_xml)
+            transformer.transform(open(os.path.join(self.module_path,"test/data/HIVDB_missingCondition.xml"), "r"))
+        except AsiParsingException as e:
+            print("CONDITION tag is a required element:\n\t%s" % str(e))
+            try:
+                actual_err_message = str(e).index("Not a Stanford resistance analysis XML file")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "Not a Stanford resistance analysis XML file\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("ex:%s" % str(exc))
+            raise exc
+
+        try:
+            transformer = XmlAsiTransformer(self.validate_xml)
+            transformer.transform(open(os.path.join(self.module_path,"test/data/HIVDB_missingActions.xml"), "r"))
+        except AsiParsingException as e:
+            print("ACTIONS tag is a required element:\n\t%s" % str(e))
+            try:
+                actual_err_message = str(e).index("Not a Stanford resistance analysis XML file")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "Not a Stanford resistance analysis XML file\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("ex:%s" % str(exc))
+            raise exc
