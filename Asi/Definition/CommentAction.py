@@ -15,8 +15,6 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
 
-from Asi.AsiEvaluationException import AsiEvaluationException
-
 
 class CommentAction(object):
 
@@ -27,9 +25,9 @@ class CommentAction(object):
     def get_comment(self):
         return self.comment
 
-    def evaluate(result):
+    def evaluate(self, result):
         """Requires a boolean argument result"""
         return self.comment if result else None
 
-    def supports(resultType):
-        return resultType.equals(bool)
+    def supports(self, resultType):
+        return isinstance(resultType, bool)
