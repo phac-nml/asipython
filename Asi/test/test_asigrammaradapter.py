@@ -1,7 +1,7 @@
 """
 Copyright Government of Canada 2018
 
-Written by: Eric Enns, National Microbiology Laboratory, Public Health Agency of Canada
+Written by: Eric Enns and Matthew Fogel, National Microbiology Laboratory, Public Health Agency of Canada
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this work except in compliance with the License. You may obtain a copy of the
@@ -16,7 +16,101 @@ specific language governing permissions and limitations under the License.
 """
 from Asi.Grammar.StringMutationComparator import StringMutationComparator
 from Asi.test.helpers.AsiGrammarTestHelper import AsiGrammarTestHelper
+from Asi.Grammar.Lexer import LexerException
+from Asi.Grammar.Parser import ParserException
 
+
+class TestResidue:
+
+    @classmethod
+    def setup_class(cls):
+        cls.comparator = StringMutationComparator(False)
+        cls.mutations = ["41L", "50VW", "Q98LRG"]
+
+    def test_residue_with_original_amino_acid(self):
+        statement = "M41L"
+        adapter = AsiGrammarTestHelper.apply_statement(statement, self.mutations, self.comparator)
+
+        assert adapter.get_result()
+
+    def test_residue_without_original_amino_acid(self):
+        statement = "41L"
+        adapter = AsiGrammarTestHelper.apply_statement(statement, self.mutations, self.comparator)
+
+        assert adapter.get_result()
+
+    def test_residue_not_with_original_amino_acid(self):
+        statement = "NOT M41L"
+        adapter = AsiGrammarTestHelper.apply_statement(statement, self.mutations, self.comparator)
+
+        assert adapter.get_result() is False
+
+    def test_residue_not_with_original_amino_acid_and_list_of_amino_acids(self):
+        statement = "NOT M41LNK"
+        adapter = AsiGrammarTestHelper.apply_statement(statement, self.mutations, self.comparator)
+
+        assert adapter.get_result() is False
+
+    def test_residue_not_without_original_amino_acid(self):
+        statement = "NOT 41L"
+        adapter = AsiGrammarTestHelper.apply_statement(statement, self.mutations, self.comparator)
+
+        assert adapter.get_result() is False
+
+    def test_residue_invert_with_original_amino_acid(self):
+        statement = "N41(NOT L)"
+        adapter = AsiGrammarTestHelper.apply_statement(statement, self.mutations, self.comparator)
+
+        assert adapter.get_result() is False
+
+    def test_residue_invert_without_original_amino_acid(self):
+        statement = "41(NOT L)"
+        adapter = AsiGrammarTestHelper.apply_statement(statement, self.mutations, self.comparator)
+
+        assert adapter.get_result() is False
+
+
+class TestExclude:
+    @classmethod
+    def setup_class(cls):
+        cls.comparator = StringMutationComparator(False)
+        cls.mutations = ["41L", "50VW", "Q98LRG"]
+
+    def test_exclude_residue_with_original_amino_acid(self):
+        statement = "EXCLUDE M41L"
+        adapter = AsiGrammarTestHelper.apply_statement(statement, self.mutations, self.comparator)
+
+        assert adapter.get_result() is False
+
+    def test_exclude_residue_without_original_amino_acid(self):
+        statement = "EXCLUDE 41L"
+        adapter = AsiGrammarTestHelper.apply_statement(statement, self.mutations, self.comparator)
+
+        assert adapter.get_result() is False
+
+    def test_exclude_residue_not_with_original_amino_acid(self):
+        statement = "EXCLUDE NOT M41L"
+        adapter = AsiGrammarTestHelper.apply_statement(statement, self.mutations, self.comparator)
+
+        assert adapter.get_result() is True
+
+    def test_exclude_residue_not_without_original_amino_acid(self):
+        statement = "EXCLUDE NOT 41L"
+        adapter = AsiGrammarTestHelper.apply_statement(statement, self.mutations, self.comparator)
+
+        assert adapter.get_result() is True
+
+    def test_exclude_residue_invert_with_original_amino_acid(self):
+        statement = "EXCLUDE M41(NOT L)"
+        adapter = AsiGrammarTestHelper.apply_statement(statement, self.mutations, self.comparator)
+
+        assert adapter.get_result() is True
+
+    def test_exclude_residue_invert_without_original_amino_acid(self):
+        statement = "EXCLUDE 41(NOT L)"
+        adapter = AsiGrammarTestHelper.apply_statement(statement, self.mutations, self.comparator)
+
+        assert adapter.get_result() is True
 
 class TestSelect:
 
