@@ -24,7 +24,7 @@ from Asi.Definition.Gene import Gene
 from Asi.Definition.LevelDefinition import LevelDefinition
 from Asi.Definition.Rule import Rule
 from Asi.Definition.ScoreRangeAction import ScoreRangeAction
-from Asi.Evalute.EvaluatedGene import EvaluatedGene
+from Asi.Evaluate.EvaluatedGene import EvaluatedGene
 from Asi.Grammar.StringMutationComparator import StringMutationComparator
 from Asi.XML.XmlAsiTransformer import XmlAsiTransformer
 
@@ -41,5 +41,3 @@ class RuleTest:
         cls.mutations = (cls.mutations_list).split(",")
         if not cls.mutation_comparator.are_mutations_valid(cls.mutations):
             raise Exception("Mutations are not valid %s" % cls.mutations_list)
-
-    
