@@ -26,15 +26,15 @@ class ScoreRangeAction(object):
         self.check_for_overlapping_ranges(range_values)
         self.range_values = range_values
 
-    def check_for_overlapping_ranges(range_values):
+    def check_for_overlapping_ranges(self, range_values):
         """Requires a list of RangeValue objects"""
         for range_value1 in self.range_values:
             for range_value2 in self.range_values:
                 try:
-                    if (range_value1 is not range_value2
-                        and range_value1.is_overlapping(range_value_2)):
-                            raise AsiParsingException("Score range values overlap: %, %"
-                                                      % (range_value1, range_value2))
+                    if (range_value1 is not range_value2 and
+                            range_value1.is_overlapping(range_value2)):
+                                raise AsiParsingException("Score range values overlap: %, %"
+                                                          % (range_value1, range_value2))
                 except AttributeError:
                     raise
 
@@ -48,6 +48,7 @@ class ScoreRangeAction(object):
                     return range_value.get_level()
             except AttributeError:
                 raise
+        raise AsiEvaluationException("No score range has been defined for a score of: %s" % result)
 
     def supports(self, result_type):
         """Returns bool indicating if result_type matches the argument type evalute requires"""
