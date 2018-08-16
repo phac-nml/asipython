@@ -33,15 +33,12 @@ class RuleCondition(object):
         except Exception:
             raise AsiParsingException("Invalid condition statement: " + statement)
 
-    def getStatement(self):
+    def get_statement(self):
         return self.statement
 
     def evaluate(self, mutations, comparator):
         adapter = AsiGrammarAdapter(mutations, comparator)
-        try:
-            self.condition_tree.apply(adapter)
-        except AsiParsingException:
-            raise
+        self.condition_tree.apply(adapter)
         return EvaluatedCondition(self, adapter)
 
     def __str__(self):
