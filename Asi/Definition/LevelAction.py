@@ -16,20 +16,20 @@ specific language governing permissions and limitations under the License.
 """
 
 
-class CommentAction(object):
+class LevelAction(object):
 
-    def __init__(self, comment):
-        """Requires a CommentDefinition object"""
-        self.comment = comment
+    def __init__(self, level):
+        """Requires a LevelDefinition object"""
+        self.level = level
 
-    def get_comment(self):
-        return self.comment
+    def get_level(self):
+        return self.level
 
     def evaluate(self, result):
         """Requires a bool argument result"""
         if not isinstance(result, bool):
-            raise ValueError("evaluate(self, result) in CommentAction requires bool argument")
-        return self.comment if result else None
+            raise ValueError("evaluate(self, result) in LevelAction requires bool argument")
+        return self.level if result else None
 
     def supports(self, result_type):
         """Returns bool indicating if result_type matches the argument type evalute requires"""

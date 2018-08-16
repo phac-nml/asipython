@@ -19,6 +19,7 @@ specific language governing permissions and limitations under the License.
 class RangeValue:
 
     def __init__(self, min_score, max_score, level):
+        """Requires float min, float max, LevelDefinition level"""
         self.min = min_score
         self.max = max_score
         self.level = level
@@ -33,11 +34,16 @@ class RangeValue:
         return self.level
 
     def within_range(self, score):
+        """Requires float score"""
         return score >= self.min and score <= self.max
 
     def __str__(self):
         return "%f to %f => %i" % (self.min, self.max, self.level.get_order())
 
     def is_overlapping(self, other):
-        return (self.min <= other.min and other.min <= self.max) \
-               or (other.min <= self.min and self.min <= self.max)
+        """Requires RangeValue other"""
+        try:
+            return (self.min <= other.min and other.min <= self.max) \
+                   or (other.min <= self.min and self.min <= self.max)
+        except AttributeError:
+            raise
