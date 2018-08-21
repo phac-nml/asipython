@@ -177,9 +177,9 @@ class XmlAsiTransformer:
             rule_actions = list()
             # attempt to retrieve all of the possible action nodes
             # (e.g. comment, score range, level)
-            comment_node = self.select_unique_single_node(rule, self.RULE_COMMENT_XPATH)
-            level_node = self.select_unique_single_node(rule, self.RULE_LEVEL_XPATH)
-            score_range_node = self.select_unique_single_node(rule, self.RULE_SCORERANGE_XPATH)
+            comment_node = rule.find(self.RULE_COMMENT_XPATH)
+            level_node = rule.find(self.RULE_LEVEL_XPATH)
+            score_range_node = rule.find(self.RULE_SCORERANGE_XPATH)
 
             if comment_node is not None:
                 definition = self.get_required_definition(comments, comment_node)
@@ -202,13 +202,6 @@ class XmlAsiTransformer:
             drug_rules.append(Rule(condition, rule_actions))
 
         return drug_rules
-
-    def select_unique_single_node(self, parent, xpath):
-        nodes = parent.xpath(xpath)
-        if len(nodes) > 1:
-            raise AsiParsingException("unique node: " + xpath + ", does not exist within parent: " + parent)
-
-        return None if len(nodes) == 0 else nodes.get(0)
 
     def get_required_definition(self, definitions, key):
         obj = definitions.get(str(key)).strip()
