@@ -90,7 +90,7 @@ class TestRule:
 
     def test_required_global_range(self):
         try:
-            transformer = XmlAsiTransformer(self.validate_xml)
+            transformer = XmlAsiTransformer(False)
             fd = open(os.path.join(self.module_path,"test/data/HIVDB_missingRequiredGlobalRange.xml"), "r")
             transformer.transform(fd)
         except AsiParsingException as e:

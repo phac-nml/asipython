@@ -48,17 +48,17 @@ class XmlAsiTransformer:
 
     GLOBAL_RANGE_XPATH = "/ALGORITHM/DEFINITIONS/GLOBALRANGE"
 
-    DRUG_XPATH = "ALGORITHM/DRUG"
+    DRUG_XPATH = "/ALGORITHM/DRUG"
     DRUG_NAME_XPATH = "NAME"
     DRUG_FULLNAME_XPATH = "FULLNAME"
 
-    ALGORITHM_NAME_XPATH = "ALGORITHM/ALGNAME"
-    ALGORITHM_VERSION_XPATH = "ALGORITHM/ALGVERSION"
-    ALGORITHM_DATE_XPATH = "ALGORITHM/ALGDATE"
+    ALGORITHM_NAME_XPATH = "/ALGORITHM/ALGNAME"
+    ALGORITHM_VERSION_XPATH = "/ALGORITHM/ALGVERSION"
+    ALGORITHM_DATE_XPATH = "/ALGORITHM/ALGDATE"
 
     RULE_XPATH = "RULE"
     RULE_CONDITION_XPATH = "CONDITION"
-    RULE_COMMENT_XPATH = "ACTIONS/COMMENT/@ref"
+    RULE_COMMENT_XPATH = "ACTIONS/COMMENT/ref"
     RULE_LEVEL_XPATH = "ACTIONS/LEVEL"
     RULE_SCORERANGE_XPATH = "ACTIONS/SCORERANGE"
     RULE_USE_GLOBALRANGE_PATH = "USE_GLOBALRANGE"
@@ -84,7 +84,7 @@ class XmlAsiTransformer:
             elif schema.split('/')[-1] == 'ASI2.1.dtd':
                 dtd = etree.DTD(open(os.path.join(module_path, "ASI2.1.dtd")))
 
-            if dtd is None or dtd.validate(root):
+            if dtd is None or not dtd.validate(root):
                 raise AsiParsingException("Not a Stanford resistance analysis XML file")
 
         levels = self.create_level_dict(root)
@@ -160,7 +160,7 @@ class XmlAsiTransformer:
         for drug in drug_nodes:
             drug_name = drug.find(self.DRUG_NAME_XPATH).text.strip()
             drug_full_name = None
-            if drug.find(self.DRUG_FULLNAME_XPATH).text is not None:
+            if drug.find(self.DRUG_FULLNAME_XPATH) is not None:
                 drug_full_name = drug.find(self.DRUG_FULLNAME_XPATH).text.strip()
 
             # get all the rules for one drug
@@ -191,8 +191,8 @@ class XmlAsiTransformer:
                 # If a global range reference exists map to the global range else parse outa  new range
                 score_range = list()
                 if len(score_range_node.xpath(self.RULE_USE_GLOBALRANGE_PATH)) == 1:
-                    if len(global_range) == 0:
-                        raise AsiParsingException("required global range does not exist: " + score_range_node)
+                    if global_range is None or len(global_range) == 0:
+                        raise AsiParsingException("required global range does not exist: " + str(score_range_node.tag))
                     score_range = global_range
                 else:
                     score_range = self.parse_score_range(score_range_node.text.strip(), levels)
