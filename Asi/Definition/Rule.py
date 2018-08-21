@@ -52,7 +52,7 @@ class Rule(object):
             evaluated_condition.add_definition(action.evaluate(evaluator.get_result()))
         return evaluated_condition
 
-    def more_than_one_score_range(actions):
+    def more_than_one_score_range(self, actions):
         """Requires a list argument actions"""
         score_range_action_count = 0
         for action in actions:

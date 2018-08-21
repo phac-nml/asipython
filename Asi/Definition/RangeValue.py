@@ -44,6 +44,6 @@ class RangeValue:
         """Requires RangeValue other"""
         try:
             return (self.min <= other.min and other.min <= self.max) \
-                   or (other.min <= self.min and self.min <= self.max)
+                   or (other.min <= self.min and self.min <= other.max)
         except AttributeError:
             raise

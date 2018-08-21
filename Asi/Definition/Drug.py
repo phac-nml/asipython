@@ -24,7 +24,7 @@ class Drug:
     def __init__(self, name, full_name, rules):
         self.name = name
         self.full_name = full_name
-        self.rules = rules
+        self.drug_rules = rules
 
     def get_drug_name(self):
         return self.name

@@ -28,13 +28,13 @@ class ScoreRangeAction(object):
 
     def check_for_overlapping_ranges(self, range_values):
         """Requires a list of RangeValue objects"""
-        for range_value1 in self.range_values:
-            for range_value2 in self.range_values:
+        for range_value1 in range_values:
+            for range_value2 in range_values:
                 try:
                     if (range_value1 is not range_value2 and
                             range_value1.is_overlapping(range_value2)):
-                                raise AsiParsingException("Score range values overlap: %, %"
-                                                          % (range_value1, range_value2))
+                                raise AsiParsingException("Score range values overlap: %s, %s"
+                                                          % (str(range_value1), str(range_value2)))
                 except AttributeError:
                     raise
 

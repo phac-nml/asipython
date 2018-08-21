@@ -106,3 +106,59 @@ class TestRule:
             raise exc
         finally:
             fd.close()
+
+    def test_bool_result_rule_action_type(self):
+        """for ETR drug, drug class NNRTI, for the rule, which is a bool condition, the actions contain as SCORERANGE action"""
+        gene_dict = dict()
+        transformer = None
+        try:
+            transformer = XmlAsiTransformer(False)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_invalidRuleActionType.xml"), "r")
+            gene_dict = transformer.transform(fd)
+        except AsiParsingException as e:
+            print("testInvalidRuleActionType AsiParsingException:" + str(e))
+            raise e
+        except Exception as exc:
+            print("testInvalidRuleActionType Exception:" + str(exc))
+            raise exc
+
+        try:
+            # get Gene
+            gene = gene_dict.get(self.gene_name)
+            # get set
+            drug_classes = gene.get_drug_classes()
+
+            # get DrugClass
+            drug_class = None
+            for item in drug_classes:
+                if item.get_class_name() == "NNRTI":
+                    drug_class = item
+                    break
+
+            # get Drug
+            drug = None
+            for item in drug_class.get_drugs():
+                if item.get_drug_name() == "ETR":
+                    drug = item
+                    break
+
+            levels = dict()
+            levels["1"] = LevelDefinition(1, "level 1","S")
+            levels["2"] = LevelDefinition(1, "level 1", "S")
+
+            score_range_str = "(-INF TO 10 => 1, 11 TO INF  => 2)"
+            score_range = transformer.parse_score_range(score_range_str, levels)
+            drug_rule = drug.get_drug_rules()[0]
+            drug_rule.get_actions.append(ScoreRangeAction(score_range))
+
+        except AsiEvaluationException as e:
+            print("the action does not support a result of type:" + str(e))
+            try:
+                actual_err_message = str(e).index("does not support a result of type")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "does not support a result of type\n" +
+                                "Instead received:%s" % (str(e)))
+        except AsiParsingException as ape:
+            print("testInvalidRuleActionType AsiParsingException (evaluate):" + str(ape))
+            raise ape

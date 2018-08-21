@@ -23,6 +23,11 @@ from Asi.Definition.CommentDefinition import CommentDefinition
 from Asi.Definition.RangeValue import RangeValue
 from Asi.Definition.Drug import Drug
 from Asi.Definition.RuleCondition import RuleCondition
+from Asi.Definition.ScoreRangeAction import ScoreRangeAction
+from Asi.Definition.Rule import Rule
+from Asi.Definition.CommentAction import CommentAction
+from Asi.Definition.LevelAction import LevelAction
+from Asi.Definition.ScoreRangeAction import ScoreRangeAction
 
 
 class XmlAsiTransformer:
@@ -58,7 +63,8 @@ class XmlAsiTransformer:
 
     RULE_XPATH = "RULE"
     RULE_CONDITION_XPATH = "CONDITION"
-    RULE_COMMENT_XPATH = "ACTIONS/COMMENT/ref"
+    RULE_COMMENT_XPATH = "ACTIONS/COMMENT"
+    RULE_COMMENT_REF_XPATH = "ref"
     RULE_LEVEL_XPATH = "ACTIONS/LEVEL"
     RULE_SCORERANGE_XPATH = "ACTIONS/SCORERANGE"
     RULE_USE_GLOBALRANGE_PATH = "USE_GLOBALRANGE"
@@ -90,7 +96,7 @@ class XmlAsiTransformer:
         levels = self.create_level_dict(root)
         comments = self.create_comment_dict(root)
 
-        global_node = root.find(self.GLOBAL_RANGE_XPATH)
+        global_node = self.select_unique_single_node(root, self.GLOBAL_RANGE_XPATH)
         global_range = self.parse_score_range(global_node.text.strip(), levels) \
             if global_node is not None else None
         drugs = self.parse_drugs(root, levels, comments, global_range)
@@ -177,12 +183,12 @@ class XmlAsiTransformer:
             rule_actions = list()
             # attempt to retrieve all of the possible action nodes
             # (e.g. comment, score range, level)
-            comment_node = rule.find(self.RULE_COMMENT_XPATH)
-            level_node = rule.find(self.RULE_LEVEL_XPATH)
-            score_range_node = rule.find(self.RULE_SCORERANGE_XPATH)
+            comment_node = self.select_unique_single_node(rule, self.RULE_COMMENT_XPATH)
+            level_node = self.select_unique_single_node(rule, self.RULE_LEVEL_XPATH)
+            score_range_node = self.select_unique_single_node(rule, self.RULE_SCORERANGE_XPATH)
 
             if comment_node is not None:
-                definition = self.get_required_definition(comments, comment_node)
+                definition = self.get_required_definition(comments, comment_node.get(self.RULE_COMMENT_REF_XPATH))
                 rule_actions.append(CommentAction(definition))
             if level_node is not None:
                 definition = self.get_required_definition(levels, level_node)
@@ -198,13 +204,20 @@ class XmlAsiTransformer:
                     score_range = self.parse_score_range(score_range_node.text.strip(), levels)
                 rule_actions.append(ScoreRangeAction(score_range))
             if comment_node is None and level_node is None and score_range_node is None:
-                raise AsiParsingException("no action exists for rule: " + rule + "/ \n" + condition.get_statement())
+                raise AsiParsingException("no action exists for rule: " + str(rule.tag) + "\n" + condition.get_statement())
             drug_rules.append(Rule(condition, rule_actions))
 
         return drug_rules
 
+    def select_unique_single_node(self, parent, xpath):
+        nodes = parent.xpath(xpath)
+        if len(nodes) > 1:
+            raise AsiParsingException("unique node: " + str(xpath) + ", does not exist within parent: " + str(parent))
+
+        return None if len(nodes) == 0 else nodes[0]
+
     def get_required_definition(self, definitions, key):
-        obj = definitions.get(str(key)).strip()
+        obj = definitions.get(str(key)).text.strip()
         if obj is None:
             raise AsiParsingException("required definition: " + key + " does not exist.")
         #return the new Definition
