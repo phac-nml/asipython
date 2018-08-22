@@ -165,3 +165,48 @@ class TestRule:
         except AsiParsingException as ape:
             print("testInvalidRuleActionType AsiParsingException (evaluate):" + str(ape))
             raise ape
+
+    def test_float_result_rule_action_type(self):
+        """for ETR drug, drug class NNRTI, for the rule, which is a score condition, the actions contain a COMMENT action"""
+        gene_dict = dict()
+        transformer = None
+        try:
+            transformer = XmlAsiTransformer(False)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_invalidFloatResultActionType.xml"), "r")
+            gene_dict = transformer.transform(fd)
+        except AsiParsingException as e:
+            print("testInvalidRuleActionType AsiParsingException:" + str(e))
+            raise e
+        except Exception as exc:
+            print("testInvalidRuleActionType Exception:" + str(exc))
+            raise exc
+
+        # get Gene
+        gene = gene_dict.get(self.gene_name)
+        # get set of DrugClass objects
+        drug_classes = gene.get_drug_classes()
+
+        # get DrugClass
+        drug_class = None
+        for item in drug_classes:
+            if item.get_class_name() == "NNRTI":
+                drug_class = item
+                break
+
+        # get Drug
+        drug = None
+        for item in drug_class.get_drugs():
+            if item.get_drug_name() == "ETR":
+                drug = item
+                break
+
+        # get Rule
+        drug_rule = drug.get_drug_rules()[0]
+        drug_rule.get_actions().append(CommentAction(CommentDefinition("test","used in Python tests",1)))
+
+        try:
+            evaluated_gene = gene.evaluate(self.mutations, self.mutation_comparator)
+        except AsiEvaluationException as e:
+            print("the action does not support a result of type:\n\t" + str(e))
+            actual_err_message = str(e).index("does not support a result of type:")
+            assert True == (actual_err_message > -1)
