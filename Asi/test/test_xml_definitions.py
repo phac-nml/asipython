@@ -44,12 +44,134 @@ class TestXMLDefinitions:
             fd = open(os.path.join(self.module_path,"test/data/HIVDB_overlappingRanges.xml"), "r")
             transformer.transform(fd)
         except AsiParsingException as e:
-            print("testOverLappingRanges:\n\t%s" % str(e))
+            print("test_overLapping_ranges:\n\t%s" % str(e))
             try:
                 actual_err_message = str(e).index("Score range values overlap")
             except ValueError as v:
                 raise Exception("The following error message was expected: " +
                                 "Score range values overlap\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("ex:%s" % str(exc))
+            raise exc
+        finally:
+            fd.close()
+
+    def test_multiple_global_range_tags(self):
+        """Test multiple global range tags"""
+        try:
+            transformer = XmlAsiTransformer(self.validate_xml)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_multipleGlobalRangeTags.xml"), "r")
+            transformer.transform(fd)
+        except AsiParsingException as e:
+            print("test_multiple_global_range_tags:\n\t%s" % str(e))
+            try:
+                actual_err_message = str(e).index("Not a Stanford resistance analysis XML file")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "Not a Stanford resistance analysis XML file\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("ex:%s" % str(exc))
+            raise exc
+        finally:
+            fd.close()
+
+    def test_missing_drug_class_name(self):
+        """Test missing drug class name"""
+        try:
+            transformer = XmlAsiTransformer(self.validate_xml)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_missingDrugClassName.xml"), "r")
+            transformer.transform(fd)
+        except AsiParsingException as e:
+            print("test_missing_drug_class_name:\n\t%s" % str(e))
+            try:
+                actual_err_message = str(e).index("Not a Stanford resistance analysis XML file")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "Not a Stanford resistance analysis XML file\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("ex:%s" % str(exc))
+            raise exc
+        finally:
+            fd.close()
+
+
+    def test_missing_drug_class_drug_list(self):
+        """Test missing drug class drug list"""
+        try:
+            transformer = XmlAsiTransformer(self.validate_xml)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_missingDrugClassDrugList.xml"), "r")
+            transformer.transform(fd)
+        except AsiParsingException as e:
+            print("test_missing_drug_class_drug_list:\n\t%s" % str(e))
+            try:
+                actual_err_message = str(e).index("Not a Stanford resistance analysis XML file")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "Not a Stanford resistance analysis XML file\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("ex:%s" % str(exc))
+            raise exc
+        finally:
+            fd.close()
+
+
+    def test_multiple_comment_definition_tags(self):
+        """Test multiple comment definition tags"""
+        try:
+            transformer = XmlAsiTransformer(self.validate_xml)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_multipleCommentDefinitionTags.xml"), "r")
+            transformer.transform(fd)
+        except AsiParsingException as e:
+            print("test_multiple_comment_definition_tags:\n\t%s" % str(e))
+            try:
+                actual_err_message = str(e).index("Not a Stanford resistance analysis XML file")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "Not a Stanford resistance analysis XML file\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("ex:%s" % str(exc))
+            raise exc
+        finally:
+            fd.close()
+
+    def test_missing_level_definition_order(self):
+        """Test missing_level_definition_order"""
+        try:
+            transformer = XmlAsiTransformer(self.validate_xml)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_missingLevelDefinitionOrder.xml"), "r")
+            transformer.transform(fd)
+        except AsiParsingException as e:
+            print("test_missing_level_definition_order:\n\t%s" % str(e))
+            try:
+                actual_err_message = str(e).index("Not a Stanford resistance analysis XML file")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "Not a Stanford resistance analysis XML file\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("ex:%s" % str(exc))
+            raise exc
+        finally:
+            fd.close()
+
+    def test_missing_level_definition_sir(self):
+        """Test missing_level_definition_sir"""
+        try:
+            transformer = XmlAsiTransformer(self.validate_xml)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_missingLevelDefinitionSIR.xml"), "r")
+            transformer.transform(fd)
+        except AsiParsingException as e:
+            print("test_missing_level_definition_sir:\n\t%s" % str(e))
+            try:
+                actual_err_message = str(e).index("Not a Stanford resistance analysis XML file")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "Not a Stanford resistance analysis XML file\n" +
                                 "Instead received:%s" % (str(e)))
         except Exception as exc:
             print("ex:%s" % str(exc))
