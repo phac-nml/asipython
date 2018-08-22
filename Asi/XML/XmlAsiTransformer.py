@@ -1,7 +1,8 @@
 """
 Copyright Government of Canada 2018
 
-Written by: Eric Enns and Matthew Fogel, National Microbiology Laboratory, Public Health Agency of Canada
+Written by: Eric Enns and Matthew Fogel, National Microbiology Laboratory,
+            Public Health Agency of Canada
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this work except in compliance with the License. You may obtain a copy of the
@@ -23,11 +24,10 @@ from Asi.Definition.CommentDefinition import CommentDefinition
 from Asi.Definition.RangeValue import RangeValue
 from Asi.Definition.Drug import Drug
 from Asi.Definition.RuleCondition import RuleCondition
-from Asi.Definition.ScoreRangeAction import ScoreRangeAction
 from Asi.Definition.Rule import Rule
+from Asi.Definition.ScoreRangeAction import ScoreRangeAction
 from Asi.Definition.CommentAction import CommentAction
 from Asi.Definition.LevelAction import LevelAction
-from Asi.Definition.ScoreRangeAction import ScoreRangeAction
 from Asi.Definition.DrugClass import DrugClass
 from Asi.Definition.Gene import Gene
 
@@ -113,7 +113,8 @@ class XmlAsiTransformer:
 
         intersection = gene_names_drugs.intersection(gene_names_comments)
         if len(intersection) < len(gene_names_comments):
-            raise AsiParsingException("Some genes defined in MUTATION_COMMENTS, have no corresponding GENE_DEFINITION.")
+            raise AsiParsingException("Some genes defined in MUTATION_COMMENTS," +
+                                      " have no corresponding GENE_DEFINITION.")
 
         gene_names = set()
         gene_names.update(gene_names_drugs)
@@ -217,23 +218,30 @@ class XmlAsiTransformer:
             score_range_node = self.select_unique_single_node(rule, self.RULE_SCORERANGE_XPATH)
 
             if comment_node is not None:
-                definition = self.get_required_definition(comments, comment_node.get(self.RULE_COMMENT_REF_XPATH))
+                definition = \
+                    self.get_required_definition(comments,
+                                                 comment_node.get(self.RULE_COMMENT_REF_XPATH))
                 rule_actions.append(CommentAction(definition))
             if level_node is not None:
                 definition = self.get_required_definition(levels, level_node)
                 rule_actions.append(LevelAction(definition))
             if score_range_node is not None:
-                # If a global range reference exists map to the global range else parse outa  new range
+                # If a global range reference exists map to the global range
+                # else parse out a new range
                 score_range = list()
                 if len(score_range_node.xpath(self.RULE_USE_GLOBALRANGE_PATH)) == 1:
                     if global_range is None or len(global_range) == 0:
-                        raise AsiParsingException("required global range does not exist: " + str(score_range_node.tag))
+                        raise AsiParsingException("required global range does not exist: " +
+                                                  str(score_range_node.tag))
                     score_range = global_range
                 else:
                     score_range = self.parse_score_range(score_range_node.text.strip(), levels)
                 rule_actions.append(ScoreRangeAction(score_range))
             if comment_node is None and level_node is None and score_range_node is None:
-                raise AsiParsingException("no action exists for rule: " + str(rule.tag) + "\n" + condition.get_statement())
+                raise AsiParsingException("no action exists for rule: " +
+                                          str(rule.tag) +
+                                          "\n" +
+                                          condition.get_statement())
             drug_rules.append(Rule(condition, rule_actions))
 
         return drug_rules
@@ -246,17 +254,23 @@ class XmlAsiTransformer:
         nodes = root.xpath(self.DRUG_CLASS_XPATH)
         # for every drug class node create a DrugClass object
         for drug_class_node in nodes:
-            class_name = self.select_unique_single_node(drug_class_node, self.DRUG_CLASS_NAME_XPATH).text.strip()
-            drug_list_str = self.select_unique_single_node(drug_class_node, self.DRUG_CLASS_DRUGLIST_XPATH).text.strip()
+            class_name = self.select_unique_single_node(drug_class_node,
+                                                        self.DRUG_CLASS_NAME_XPATH).text.strip()
+            drug_list_str = \
+                self.select_unique_single_node(drug_class_node,
+                                               self.DRUG_CLASS_DRUGLIST_XPATH).text.strip()
             drug_names = drug_list_str.split(",")
 
             drug_list = set()
             for i in range(0, len(drug_names)):
                 drug = drugs.get(drug_names[i].strip())
                 if drug is None:
-                    raise AsiParsingException(drug_names[i].strip() + " has not been defined as a drug.")
+                    raise AsiParsingException(drug_names[i].strip() +
+                                              " has not been defined as a drug.")
                 if not self.is_unique_defined_drug(drug.get_drug_name(), drug_classes):
-                    raise AsiParsingException("The drug: " + drug.get_drug_name() + "; has been defined for more than one drug class.")
+                    raise AsiParsingException("The drug: " +
+                                              drug.get_drug_name() +
+                                              "; has been defined for more than one drug class.")
 
                 # remove the valid drug from the drug list defined in DRUG tags
                 tag_defined_drug_names.remove(drug.get_drug_name())
@@ -267,8 +281,9 @@ class XmlAsiTransformer:
         # some drugs defined in DRUG tags are not associated with any class
 
         if len(tag_defined_drug_names) > 0:
-            raise AsiParsingException("The following drugs have not been associated with a drug class: " + str(tag_defined_drug_names))
-
+            raise AsiParsingException("The following drugs have not been associated" +
+                                      "with a drug class: " +
+                                      str(tag_defined_drug_names))
 
         return drug_classes
 
@@ -285,7 +300,8 @@ class XmlAsiTransformer:
             # get the names of drug drug_classes
             drug_class_list_nodes = node.xpath(self.GENE_DEFINITION_DRUGCLASSLIST_XPATH)
             if len(drug_class_list_nodes) > 1:
-                raise AsiParsingException("duplicate node " + self.GENE_DEFINITION_DRUGCLASSLIST_XPATH)
+                raise AsiParsingException("duplicate node " +
+                                          self.GENE_DEFINITION_DRUGCLASSLIST_XPATH)
 
             drug_class_set = set()
             if len(drug_class_list_nodes) == 1:
@@ -310,7 +326,8 @@ class XmlAsiTransformer:
 
         # for every gene node
         for gene_node in nodes:
-            gene_name_node = self.select_unique_single_node(gene_node, self.GENE_MUTATION_COMMENTS_NAME_XPATH)
+            gene_name_node = self.select_unique_single_node(gene_node,
+                                                            self.GENE_MUTATION_COMMENTS_NAME_XPATH)
 
             # if no gene name throw an AsiParsingException
             if gene_name_node is None:
@@ -348,7 +365,10 @@ class XmlAsiTransformer:
     def select_unique_single_node(self, parent, xpath):
         nodes = parent.xpath(xpath)
         if len(nodes) > 1:
-            raise AsiParsingException("unique node: " + str(xpath) + ", does not exist within parent: " + str(parent))
+            raise AsiParsingException("unique node: " +
+                                      str(xpath) +
+                                      ", does not exist within parent: " +
+                                      str(parent))
 
         return None if len(nodes) == 0 else nodes[0]
 
@@ -356,5 +376,5 @@ class XmlAsiTransformer:
         obj = definitions.get(str(key)).text.strip()
         if obj is None:
             raise AsiParsingException("required definition: " + key + " does not exist.")
-        #return the new Definition
+        # return the new Definition
         return obj
