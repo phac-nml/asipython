@@ -19,23 +19,28 @@ from Asi.AsiEvaluationException import AsiEvaluationException
 from Asi.Evaluate.EvaluatedDrugClass import EvaluatedDrugClass
 
 
-class DrugClass(object):
+class DrugClass:
+    """DrugClass"""
 
     def __init__(self, name, drugs):
+        """Params: str name, set drugs"""
         self.name = name
         self.drugs = drugs
 
     def get_class_name(self):
+        """Returns: str name"""
         return self.name
 
     def get_drugs(self):
+        """Returns: set drugs"""
         return self.drugs
 
     def __str__(self):
         return self.name
 
+    # pylint: disable=try-except-raise
     def evaluate(self, mutations, comparator):
-        """Requires a list of mutations and a MutationComparator"""
+        """Requires a list of mutations and a StringMutationComparator"""
         evaluated_drugs = list()
         for drug in self.drugs:
             try:

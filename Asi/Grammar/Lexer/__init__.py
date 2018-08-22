@@ -328,7 +328,7 @@ ACCEPT_TABLE = [
 
 
 # pylint: disable=too-many-instance-attributes
-class Lexer(object):
+class Lexer:
     def __init__(self, source):
         if isinstance(source, bytes):
             self.reader = PushbackReader(open(source, "r"))
@@ -435,6 +435,7 @@ class Lexer(object):
                     accept_line = self.line
             else:
                 if accept_state != -1:
+                    # pylint: disable=chained-comparison
                     if accept_token >= 0 and accept_token <= 19:
                         token = ACCEPT_TOKENS[accept_token](start_line + 1, start_pos + 1)
                         if token.get_text() is None:

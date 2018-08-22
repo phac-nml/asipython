@@ -16,24 +16,31 @@ specific language governing permissions and limitations under the License.
 """
 
 
-class CommentDefinition(object):
+class CommentDefinition:
+    """CommentDefinition"""
+
     FORMAT = "{id: %s, text: %s, sort: %d}"
 
     def __init__(self, identifier, text, sort=None):
+        """Params: str identifier, str text, int sort"""
         self.identifier = identifier
         self.text = text
         self.sort = sort
 
     def get_id(self):
+        """Returns: str identifier"""
         return self.identifier
 
     def get_text(self):
+        """Returns: str text"""
         return self.text
 
     def get_sort(self):
+        """Returns: int sort"""
         return self.sort
 
     def get_resistance(self):
+        """Returns: str text"""
         return self.text
 
     def __str__(self):

@@ -16,13 +16,15 @@ specific language governing permissions and limitations under the License.
 """
 
 
-class LevelAction(object):
+class LevelAction:
+    """LevelAction"""
 
     def __init__(self, level):
         """Requires a LevelDefinition object"""
         self.level = level
 
     def get_level(self):
+        """Returns: LevelDefinition level"""
         return self.level
 
     def evaluate(self, result):
@@ -31,6 +33,7 @@ class LevelAction(object):
             raise ValueError("evaluate(self, result) in LevelAction requires bool argument")
         return self.level if result else None
 
+    # pylint: disable=no-self-use
     def supports(self, result_type):
         """Returns bool indicating if result_type matches the argument type evalute requires"""
         return isinstance(result_type, bool)

@@ -20,11 +20,12 @@ from Asi.AsiEvaluationException import AsiEvaluationException
 from Asi.Definition.ScoreRangeAction import ScoreRangeAction
 
 
-class Rule(object):
+class Rule:
+    """rule"""
 
     def __init__(self, condition, actions):
         """Requires a RuleCondition argument condition and a list argument actions."""
-        if len(actions) == 0:
+        if not actions:
             raise AsiParsingException("no action exists for the rule:\n%s" %
                                       condition.get_statement())
         elif self.more_than_one_score_range(actions):
@@ -34,13 +35,15 @@ class Rule(object):
         self.actions = actions
 
     def get_condition(self):
+        """Returns: RuleCondition condition"""
         return self.condition
 
     def get_actions(self):
+        """Returns: list actions"""
         return self.actions
 
     def evaluate(self, mutations, comparator):
-        """Requires a list of mutations and a MutationComparator"""
+        """Requires a list of mutations and a StringMutationComparator"""
         # get the EvaluatedCondition object
         evaluated_condition = self.condition.evaluate(mutations, comparator)
         # get the AsiGrammarAdapter object
@@ -52,6 +55,7 @@ class Rule(object):
             evaluated_condition.add_definition(action.evaluate(evaluator.get_result()))
         return evaluated_condition
 
+    # pylint: disable=no-self-use
     def more_than_one_score_range(self, actions):
         """Requires a list argument actions"""
         score_range_action_count = 0

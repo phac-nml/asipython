@@ -16,7 +16,9 @@ specific language governing permissions and limitations under the License.
 """
 
 
-class LevelDefinitionComparator(object):
+# pylint: disable=too-few-public-methods
+class LevelDefinitionComparator:
+    """LevelDefinitionComparator"""
 
     @classmethod
     def compare(cls, level1, level2):

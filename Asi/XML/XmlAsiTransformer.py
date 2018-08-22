@@ -33,12 +33,15 @@ from Asi.Definition.Gene import Gene
 
 
 class XmlAsiTransformer:
+    """XmlAsiTransformer"""
     SCORE_RANGE_PATTERN = \
         re.compile("(-INF|\\d+(?:\\.\\d+)?)\\s*TO\\s*(INF|\\d+(?:\\.\\d+)?)\\s*=>\\s*(\\d+)")
 
     GENE_DEFINITION_XPATH = "/ALGORITHM/DEFINITIONS/GENE_DEFINITION"
     GENE_DEFINITION_NAME_XPATH = "NAME"
+    # pylint: disable=invalid-name
     GENE_DEFINITION_DRUGCLASSLIST_XPATH = "DRUGCLASSLIST"
+    # pylint: disable=invalid-name
     GENE_MUTATION_COMMENTS_XPATH = "/ALGORITHM/MUTATION_COMMENTS/GENE"
     GENE_MUTATION_COMMENTS_NAME_XPATH = "NAME"
     GENE_RULE_XPATH = "RULE"
@@ -76,9 +79,13 @@ class XmlAsiTransformer:
     DRUG_CLASS_DRUGLIST_XPATH = "DRUGLIST"
 
     def __init__(self, validate_xml):
+        """Requires a bool argument indicating whether xml should be validated.
+           To see more specific errors turn xml validation off."""
         self.validate_xml = validate_xml
 
+    # pylint: disable=too-many-locals,c-extension-no-member
     def transform(self, asi_xml_file):
+        """Transform an xml file"""
         root = etree.parse(asi_xml_file)
         if self.validate_xml:
             schema = root.docinfo.internalDTD.system_url
@@ -138,6 +145,9 @@ class XmlAsiTransformer:
         return genes
 
     def create_level_dict(self, root):
+        """Create level dictionary.
+           Params: ElementTree root
+           Returns: dict levels"""
         nodes = root.xpath(self.LEVEL_XPATH)
         levels = {}
 
@@ -153,6 +163,9 @@ class XmlAsiTransformer:
         return levels
 
     def create_comment_dict(self, root):
+        """Create comment dictionary.
+           Params: ElementTree root
+           Returns: dict comments"""
         nodes = root.xpath(self.COMMENT_XPATH)
         comments = {}
 
@@ -172,6 +185,9 @@ class XmlAsiTransformer:
         return comments
 
     def parse_score_range(self, score_range, levels):
+        """Parse score range.
+           Params: str score_range, dict levels
+           Returns: list range_values"""
         range_values = []
 
         for match in re.finditer(self.SCORE_RANGE_PATTERN, score_range):
@@ -191,6 +207,9 @@ class XmlAsiTransformer:
         return range_values
 
     def parse_drugs(self, root, levels, comments, global_range):
+        """Parse drugs.
+           Params: ElementTree root, dict levels, dict comments, list global_range.
+           Returns: dict drugs"""
         drugs = {}
         drug_nodes = root.xpath(self.DRUG_XPATH)
         for drug in drug_nodes:
@@ -207,6 +226,9 @@ class XmlAsiTransformer:
         return drugs
 
     def parse_rules(self, rule_nodes, levels, comments, global_range):
+        """Parse rules.
+           Params: list rule_nodes, dict levels, dict comments, list global_range.
+           Returns: list drug_rules"""
         drug_rules = []
         for rule in rule_nodes:
             condition = RuleCondition(rule.find(self.RULE_CONDITION_XPATH).text.strip())
@@ -230,7 +252,7 @@ class XmlAsiTransformer:
                 # else parse out a new range
                 score_range = list()
                 if len(score_range_node.xpath(self.RULE_USE_GLOBALRANGE_PATH)) == 1:
-                    if global_range is None or len(global_range) == 0:
+                    if global_range is None:
                         raise AsiParsingException("required global range does not exist: " +
                                                   str(score_range_node.tag))
                     score_range = global_range
@@ -247,6 +269,9 @@ class XmlAsiTransformer:
         return drug_rules
 
     def parse_drug_classes(self, root, drugs):
+        """Parse drug classes
+           Params: ElementTree root, dict drugs
+           Returns: dict drug_classes"""
         tag_defined_drug_names = set()
         tag_defined_drug_names.update(set(drugs.keys()))
 
@@ -262,7 +287,7 @@ class XmlAsiTransformer:
             drug_names = drug_list_str.split(",")
 
             drug_list = set()
-            for i in range(0, len(drug_names)):
+            for i, _ in enumerate(drug_names):
                 drug = drugs.get(drug_names[i].strip())
                 if drug is None:
                     raise AsiParsingException(drug_names[i].strip() +
@@ -280,7 +305,7 @@ class XmlAsiTransformer:
 
         # some drugs defined in DRUG tags are not associated with any class
 
-        if len(tag_defined_drug_names) > 0:
+        if tag_defined_drug_names:
             raise AsiParsingException("The following drugs have not been associated" +
                                       " with a drug class: " +
                                       str(tag_defined_drug_names))
@@ -288,8 +313,11 @@ class XmlAsiTransformer:
         return drug_classes
 
     def parse_genes(self, root, drug_classes):
+        """Parses genes
+           Params: ElementTree root
+           Returns: dict drug_classes"""
         nodes = root.xpath(self.GENE_DEFINITION_XPATH)
-        if len(nodes) == 0:
+        if nodes is None:
             raise AsiParsingException("no gene specified")
 
         genes = dict()
@@ -312,7 +340,7 @@ class XmlAsiTransformer:
 
                 # create the drug class list
 
-                for i in range(0, len(drug_class_names)):
+                for i, _ in enumerate(drug_class_names):
                     drug_class_set.add(drug_classes.get(drug_class_names[i].strip()))
 
             genes[gene_name] = Gene(name=gene_name, drug_classes=drug_class_set)
@@ -320,7 +348,9 @@ class XmlAsiTransformer:
         return genes
 
     def parse_gene_mutation_comments(self, root, levels, comments, global_range):
-        """Get all the gene nodes specified in GENE_MUTATION_COMMENTS"""
+        """Get all the gene nodes specified in GENE_MUTATION_COMMENTS
+           Params: ElementTree root, dict levels, dict comments, dict global_range
+           Returns: dict genes"""
         nodes = root.xpath(self.GENE_MUTATION_COMMENTS_XPATH)
         genes = dict()
 
@@ -336,7 +366,7 @@ class XmlAsiTransformer:
             # get the gene rules
             gene_rule_nodes = gene_node.xpath(self.GENE_RULE_XPATH)
 
-            if len(gene_rule_nodes) == 0:
+            if gene_rule_nodes is None:
                 # no rules for the current gene
                 raise AsiParsingException("no rule for gene " + gene_name_node)
 
@@ -348,8 +378,11 @@ class XmlAsiTransformer:
 
         return genes
 
+    # pylint: disable=no-self-use
     def is_unique_defined_drug(self, drug_name, drug_classes):
-        """Search for every class if the drug is already associated with a different one"""
+        """Search for every class if the drug is already associated with a different one
+           Params: str drug_name, dict drug_classes
+           Returns: bool is_unique"""
         for class_name in set(drug_classes.keys()):
             # get the DrugClass
             drug_class = drug_classes.get(class_name)
@@ -362,17 +395,24 @@ class XmlAsiTransformer:
 
         return True
 
+    # pylint: disable=no-self-use
     def select_unique_single_node(self, parent, xpath):
+        """Select unique single node
+           Params: ElementTree parent, str xpath
+           Returns: Element nodes[0]"""
         nodes = parent.xpath(xpath)
         if len(nodes) > 1:
             raise AsiParsingException("unique node: " +
                                       str(xpath) +
                                       ", does not exist within parent: " +
                                       str(parent))
+        return None if not nodes else nodes[0]
 
-        return None if len(nodes) == 0 else nodes[0]
-
+    # pylint: disable=no-self-use
     def get_required_definition(self, definitions, key):
+        """Get required definition
+           Params: dict definitions, Element key
+           Returns: LevelDefinition or CommentDefinition object"""
         obj = definitions.get(key)
         if obj is None:
             raise AsiParsingException("required definition: " + key + " does not exist.")

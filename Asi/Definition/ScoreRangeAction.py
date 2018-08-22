@@ -19,13 +19,15 @@ from Asi.AsiParsingException import AsiParsingException
 from Asi.AsiEvaluationException import AsiEvaluationException
 
 
-class ScoreRangeAction(object):
+class ScoreRangeAction:
+    """ScoreRangeAction"""
 
     def __init__(self, range_values):
         """Requires a list of RangeValue objects"""
         self.check_for_overlapping_ranges(range_values)
         self.range_values = range_values
 
+    # pylint: disable=no-self-use
     def check_for_overlapping_ranges(self, range_values):
         """Requires a list of RangeValue objects"""
         for range_value1 in range_values:
@@ -33,10 +35,11 @@ class ScoreRangeAction(object):
                 try:
                     if (range_value1 is not range_value2 and
                             range_value1.is_overlapping(range_value2)):
-                                raise AsiParsingException("Score range values overlap: %s, %s"
-                                                          % (str(range_value1), str(range_value2)))
-                except AttributeError:
-                    raise
+                        raise AsiParsingException("Score range values overlap: %s, %s" %
+                                                  (str(range_value1),
+                                                   str(range_value2)))
+                except AttributeError as exc:
+                    raise exc
 
     def evaluate(self, result):
         """Requires a float argument result"""
@@ -46,10 +49,11 @@ class ScoreRangeAction(object):
             try:
                 if range_value.within_range(result):
                     return range_value.get_level()
-            except AttributeError:
-                raise
+            except AttributeError as exc:
+                raise exc
         raise AsiEvaluationException("No score range has been defined for a score of: %s" % result)
 
+    # pylint: disable=no-self-use
     def supports(self, result_type):
         """Returns bool indicating if result_type matches the argument type evalute requires"""
         return isinstance(result_type, float)

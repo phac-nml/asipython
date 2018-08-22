@@ -27,6 +27,7 @@ class AsiGrammarAdapter(DepthFirstAdapter):
     NOT_SCORED = float('nan')
 
     def __init__(self, mutation_list, comparator):
+        """Params: mutation list and comparator"""
         super().__init__()
         self.stack = Stack()
         self.all_scored_mutations = set()
@@ -37,7 +38,7 @@ class AsiGrammarAdapter(DepthFirstAdapter):
         self.is_boolean_result = True
 
     def get_result(self):
-        """Return"""
+        """Get the score"""
         score = self.stack.peek()
 
         if self.is_boolean_result:
@@ -237,10 +238,12 @@ class AsiGrammarAdapter(DepthFirstAdapter):
         return 0 if max_value == float('-infinity') else max_value
 
     def get_scored_mutations(self):
+        """Return all scored mutations"""
         return self.all_scored_mutations
 
 
-class ScoredItem(object):
+# pylint: disable=too-few-public-methods
+class ScoredItem:
     """Object used to store a ScoredItem"""
     def __init__(self, value, mutations, score):
         self.value = value

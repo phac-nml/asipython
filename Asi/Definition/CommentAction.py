@@ -16,13 +16,15 @@ specific language governing permissions and limitations under the License.
 """
 
 
-class CommentAction(object):
+class CommentAction:
+    """CommentAction"""
 
     def __init__(self, comment):
         """Requires a CommentDefinition object"""
         self.comment = comment
 
     def get_comment(self):
+        """Returns the comment"""
         return self.comment
 
     def evaluate(self, result):
@@ -31,6 +33,7 @@ class CommentAction(object):
             raise ValueError("evaluate(self, result) in CommentAction requires bool argument")
         return self.comment if result else None
 
+    # pylint: disable=no-self-use
     def supports(self, result_type):
         """Returns bool indicating if result_type matches the argument type evalute requires"""
         return isinstance(result_type, bool)

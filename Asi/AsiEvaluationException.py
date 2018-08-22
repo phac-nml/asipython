@@ -17,9 +17,10 @@ specific language governing permissions and limitations under the License.
 
 
 class AsiEvaluationException(Exception):
+    """Exception thrown during evaluation"""
     def __init__(self, message):
         super().__init__()
-        self.message = message
+        self.evaluation_message = message
 
     def __str__(self):
-        return self.message
+        return self.evaluation_message

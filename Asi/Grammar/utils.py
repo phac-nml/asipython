@@ -39,7 +39,7 @@ class Stack(list):
         return len(self) == 0
 
 
-class PushbackReader(object):
+class PushbackReader:
     def __init__(self, reader):
         self.__reader = reader
         self.__stack = Stack()
@@ -61,7 +61,7 @@ class PushbackReader(object):
         self.__stack.append(char)
 
 
-class StringBuffer(object):
+class StringBuffer:
     def __init__(self, obj=None):
         self.buffer = []
         if obj is not None:

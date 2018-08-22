@@ -49,7 +49,7 @@ class ParserException(Exception):
 
 
 # pylint: disable=too-few-public-methods
-class State(object):
+class State:
     def __init__(self, state, nodes):
         self.state = state
         self.nodes = nodes
@@ -1256,7 +1256,7 @@ ERRORS = [
 ]
 
 
-class Parser(object):
+class Parser:
     def __init__(self, lexer):
         self.lexer = lexer
         self.stack = Stack()

@@ -20,29 +20,34 @@ from Asi.Evaluate.EvaluatedDrug import EvaluatedDrug
 
 
 class Drug:
+    """Drug"""
 
     def __init__(self, name, full_name, rules):
+        """Params: str name, str full_name, list rules"""
         self.name = name
         self.full_name = full_name
         self.drug_rules = rules
 
     def get_drug_name(self):
+        """Returns: str name"""
         return self.name
 
     def get_drug_full_name(self):
+        """Returns: str full_name"""
         return self.full_name
 
     def get_drug_rules(self):
+        """Returns: list drug_rules"""
         return self.drug_rules
 
     def evaluate(self, mutations, comparator):
-        """Requires a list of mutations and a MutationComparator"""
+        """Requires a list of mutations and a StringMutationComparator"""
         evaluated_conditions = []
         for rule in self.drug_rules:
             try:
                 evaluated_conditions.append(rule.evaluate(mutations, comparator))
-            except AsiEvaluationException:
-                raise
+            except AsiEvaluationException as exc:
+                raise exc
         return EvaluatedDrug(self, evaluated_conditions)
 
     def __str__(self):

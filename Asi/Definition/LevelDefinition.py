@@ -16,24 +16,31 @@ specific language governing permissions and limitations under the License.
 """
 
 
-class LevelDefinition(object):
+class LevelDefinition:
+    """LevelDefinition"""
+
     FORMAT = "{order: %i, text: %s, sir: %s}"
 
     def __init__(self, order, text, sir):
+        """Params: int order, str text, str sir"""
         self.order = order
         self.text = text
         self.sir = sir
 
     def get_order(self):
+        """Returns: int order"""
         return self.order
 
     def get_text(self):
+        """Returns: str text"""
         return self.text
 
     def get_sir(self):
+        """Returns: str sir"""
         return self.sir
 
     def get_resistance(self):
+        """Returns: str text"""
         return self.text
 
     def __str__(self):

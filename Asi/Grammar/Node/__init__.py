@@ -20,7 +20,7 @@ specific language governing permissions and limitations under the License.
 from Asi.Grammar.utils import StringBuffer, abstract
 
 
-class Node(object):
+class Node:
     def __init__(self):
         if self.__class__ is Node:
             raise TypeError("Node class can not be instantiated.")

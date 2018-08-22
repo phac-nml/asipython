@@ -23,9 +23,11 @@ from Asi.Grammar.AsiGrammarAdapter import AsiGrammarAdapter
 from Asi.AsiParsingException import AsiParsingException
 
 
-class RuleCondition(object):
+class RuleCondition:
+    """RuleCondition"""
 
     def __init__(self, statement):
+        """Param: str statement"""
         self.statement = statement
         parser = Parser(Lexer(StringIO(str(statement))))
         try:
@@ -34,9 +36,11 @@ class RuleCondition(object):
             raise AsiParsingException("Invalid condition statement: " + statement)
 
     def get_statement(self):
+        """Returns: str statement"""
         return self.statement
 
     def evaluate(self, mutations, comparator):
+        """Requires a list of mutations and a StringMutationComparator"""
         adapter = AsiGrammarAdapter(mutations, comparator)
         self.condition_tree.apply(adapter)
         return EvaluatedCondition(self, adapter)

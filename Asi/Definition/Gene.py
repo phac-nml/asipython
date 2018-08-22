@@ -19,9 +19,11 @@ from Asi.AsiEvaluationException import AsiEvaluationException
 from Asi.Evaluate.EvaluatedGene import EvaluatedGene
 
 
-class Gene(object):
+class Gene:
+    """Gene"""
 
     def __init__(self, name, drug_classes=None, gene_rules=None):
+        """Params: str name, set drug_classes, list gene_rules"""
         self.name = name
 
         if drug_classes is None and gene_rules is None:
@@ -39,17 +41,21 @@ class Gene(object):
             self.gene_rules = list()
 
     def get_name(self):
+        """Returns: str name"""
         return self.name
 
     def get_drug_classes(self):
+        """Returns: set drug_classes"""
         return self.drug_classes
 
     def get_rules(self):
+        """Returns: list gene_rules"""
         return self.gene_rules
 
     def __str__(self):
         return self.name
 
+    # pylint: disable=try-except-raise
     def evaluate(self, mutations, comparator):
         """Requires a list of mutations and a MutationComparator"""
         evaluated_gene_rules = list()

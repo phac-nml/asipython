@@ -17,6 +17,7 @@ specific language governing permissions and limitations under the License.
 
 
 class RangeValue:
+    """RangeValue"""
 
     def __init__(self, min_score, max_score, level):
         """Requires float min, float max, LevelDefinition level"""
@@ -25,14 +26,18 @@ class RangeValue:
         self.level = level
 
     def get_min(self):
+        """Returns: float min"""
         return self.min
 
     def get_max(self):
+        """Returns: float max"""
         return self.max
 
     def get_level(self):
+        """Returns: LevelDefinition level"""
         return self.level
 
+    # pylint: disable=chained-comparison
     def within_range(self, score):
         """Requires float score"""
         return score >= self.min and score <= self.max
@@ -40,6 +45,7 @@ class RangeValue:
     def __str__(self):
         return "%f to %f => %i" % (self.min, self.max, self.level.get_order())
 
+    # pylint: disable=try-except-raise
     def is_overlapping(self, other):
         """Requires RangeValue other"""
         try:

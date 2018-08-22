@@ -17,9 +17,10 @@ specific language governing permissions and limitations under the License.
 
 
 class AsiParsingException(Exception):
+    """Exception thrown during parsing"""
     def __init__(self, message):
         super().__init__()
-        self.message = message
+        self.parsing_message = message
 
     def __str__(self):
-        return self.message
+        return self.parsing_message
