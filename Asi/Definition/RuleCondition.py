@@ -18,9 +18,9 @@ specific language governing permissions and limitations under the License.
 from io import StringIO
 from Asi.Grammar.Lexer import Lexer
 from Asi.Grammar.Parser import Parser
-from Asi.Evaluate import EvaluatedCondition
-from Asi.Grammar import AsiGrammarAdapter
-from Asi import AsiParsingException
+from Asi.Evaluate.EvaluatedCondition import EvaluatedCondition
+from Asi.Grammar.AsiGrammarAdapter import AsiGrammarAdapter
+from Asi.AsiParsingException import AsiParsingException
 
 
 class RuleCondition(object):

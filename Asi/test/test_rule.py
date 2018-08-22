@@ -125,6 +125,7 @@ class TestRule:
         try:
             # get Gene
             gene = gene_dict.get(self.gene_name)
+
             # get set
             drug_classes = gene.get_drug_classes()
 
@@ -149,16 +150,18 @@ class TestRule:
             score_range_str = "(-INF TO 10 => 1, 11 TO INF  => 2)"
             score_range = transformer.parse_score_range(score_range_str, levels)
             drug_rule = drug.get_drug_rules()[0]
-            drug_rule.get_actions.append(ScoreRangeAction(score_range))
+            drug_rule.get_actions().append(ScoreRangeAction(score_range))
 
-        except AsiEvaluationException as e:
-            print("the action does not support a result of type:" + str(e))
             try:
-                actual_err_message = str(e).index("does not support a result of type")
-            except ValueError as v:
-                raise Exception("The following error message was expected: " +
-                                "does not support a result of type\n" +
-                                "Instead received:%s" % (str(e)))
+                evaluatedGene = gene.evaluate(self.mutations, self.mutation_comparator)
+            except AsiEvaluationException as e:
+                print("the action does not support a result of type:" + str(e))
+                try:
+                    actual_err_message = str(e).index("does not support a result of type")
+                except ValueError as v:
+                    raise Exception("The following error message was expected: " +
+                                    "does not support a result of type\n" +
+                                    "Instead received:%s" % (str(e)))
         except AsiParsingException as ape:
             print("testInvalidRuleActionType AsiParsingException (evaluate):" + str(ape))
             raise ape

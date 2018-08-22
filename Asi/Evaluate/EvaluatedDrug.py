@@ -33,7 +33,7 @@ class EvaluatedDrug(object):
         self.evaluated_conditions = evaluated_conditions
         for evaluated_condition in evaluated_conditions:
 
-            self.score_mutations.update(evaluated_condition.get_evaluator().get_scored_mutations())
+            self.scored_mutations.update(evaluated_condition.get_evaluator().get_scored_mutations())
             definitions = evaluated_condition.get_definitions()
 
             for definition in definitions:

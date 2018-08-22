@@ -28,6 +28,8 @@ from Asi.Definition.Rule import Rule
 from Asi.Definition.CommentAction import CommentAction
 from Asi.Definition.LevelAction import LevelAction
 from Asi.Definition.ScoreRangeAction import ScoreRangeAction
+from Asi.Definition.DrugClass import DrugClass
+from Asi.Definition.Gene import Gene
 
 
 class XmlAsiTransformer:
@@ -100,16 +102,16 @@ class XmlAsiTransformer:
         global_range = self.parse_score_range(global_node.text.strip(), levels) \
             if global_node is not None else None
         drugs = self.parse_drugs(root, levels, comments, global_range)
-        drug_classes = self.parse_drug_classes(doc, drugs)
+        drug_classes = self.parse_drug_classes(root, drugs)
 
-        gene_evaluated_drugs = self.parse_genes(doc, drug_classes)
+        gene_evaluated_drugs = self.parse_genes(root, drug_classes)
         gene_names_drugs = set(gene_evaluated_drugs.keys())
 
         gene_evaluated_mutation_comments = \
-            self.parse_gene_mutation_comments(doc, levels, comments, global_range)
+            self.parse_gene_mutation_comments(root, levels, comments, global_range)
         gene_names_comments = set(gene_evaluated_mutation_comments.keys())
 
-        intersection = genes_names_drugs.intersection(gene_names_comments)
+        intersection = gene_names_drugs.intersection(gene_names_comments)
         if len(intersection) < len(gene_names_comments):
             raise AsiParsingException("Some genes defined in MUTATION_COMMENTS, have no corresponding GENE_DEFINITION.")
 
@@ -124,9 +126,13 @@ class XmlAsiTransformer:
             gene_drug_class = gene_evaluated_drugs.get(gene_name)
             gene_mutation_comments = gene_evaluated_mutation_comments.get(gene_name)
             if gene_mutation_comments is None:
-                genes[gene_name] = Gene(gene_name, gene_drug_class.get_drug_classes(), list())
+                genes[gene_name] = Gene(name=gene_name,
+                                        drug_classes=gene_drug_class.get_drug_classes(),
+                                        gene_rules=list())
             else:
-                genes[gene_name] = Gene(gene_name, gene_drug_class.get_drug_classes(), gene_mutation_comments.get_rules())
+                genes[gene_name] = Gene(name=gene_name,
+                                        drug_classes=gene_drug_class.get_drug_classes(),
+                                        gene_rules=gene_mutation_comments.get_rules())
 
         return genes
 
@@ -237,11 +243,11 @@ class XmlAsiTransformer:
         tag_defined_drug_names.update(set(drugs.keys()))
 
         drug_classes = dict()
-        nodes = root.xpath(DRUG_CLASS_XPATH)
+        nodes = root.xpath(self.DRUG_CLASS_XPATH)
         # for every drug class node create a DrugClass object
         for drug_class_node in nodes:
-            class_name = self.select_unique_single_node(drug_class_node, DRUG_CLASS_NAME_XPATH).text.strip()
-            drug_list_str = self.select_unique_single_node(drug_class_node, DRUG_CLASS_DRUGLIST_XPATH).text.strip()
+            class_name = self.select_unique_single_node(drug_class_node, self.DRUG_CLASS_NAME_XPATH).text.strip()
+            drug_list_str = self.select_unique_single_node(drug_class_node, self.DRUG_CLASS_DRUGLIST_XPATH).text.strip()
             drug_names = drug_list_str.split(",")
 
             drug_list = set()
@@ -256,7 +262,7 @@ class XmlAsiTransformer:
                 tag_defined_drug_names.remove(drug.get_drug_name())
                 drug_list.add(drug)
 
-            drug_classes[class_name] = drug_list
+            drug_classes[class_name] = DrugClass(class_name, drug_list)
 
         # some drugs defined in DRUG tags are not associated with any class
 
@@ -267,7 +273,7 @@ class XmlAsiTransformer:
         return drug_classes
 
     def parse_genes(self, root, drug_classes):
-        nodes = root.xpath(GENE_DEFINITION_XPATH)
+        nodes = root.xpath(self.GENE_DEFINITION_XPATH)
         if len(nodes) == 0:
             raise AsiParsingException("no gene specified")
 
@@ -275,15 +281,15 @@ class XmlAsiTransformer:
 
         # Create a map of genes. Every gene has associated a list of DrugClass objects
         for node in nodes:
-            gene_name = node.find(GENE_DEFINITION_NAME_XPATH).text.strip()
+            gene_name = node.find(self.GENE_DEFINITION_NAME_XPATH).text.strip()
             # get the names of drug drug_classes
-            drug_class_list_nodes = node.xpath(GENE_DEFINITION_DRUGCLASSLIST_XPATH).text.strip()
+            drug_class_list_nodes = node.xpath(self.GENE_DEFINITION_DRUGCLASSLIST_XPATH)
             if len(drug_class_list_nodes) > 1:
-                raise AsiParsingException("duplicate node " + GENE_DEFINITION_DRUGCLASSLIST_XPATH)
+                raise AsiParsingException("duplicate node " + self.GENE_DEFINITION_DRUGCLASSLIST_XPATH)
 
             drug_class_set = set()
             if len(drug_class_list_nodes) == 1:
-                drug_class_list_str = str(drug_class_list_nodes[0]).strip()
+                drug_class_list_str = (drug_class_list_nodes[0]).text.strip()
                 if drug_class_list_str.strip() == "":
                     raise AsiParsingException("drug class list missing for gene " + gene_name)
                 drug_class_names = drug_class_list_str.split(",")
@@ -293,25 +299,25 @@ class XmlAsiTransformer:
                 for i in range(0, len(drug_class_names)):
                     drug_class_set.add(drug_classes.get(drug_class_names[i].strip()))
 
-            genes[gene_name] = drug_class_set
+            genes[gene_name] = Gene(name=gene_name, drug_classes=drug_class_set)
 
         return genes
 
     def parse_gene_mutation_comments(self, root, levels, comments, global_range):
         """Get all the gene nodes specified in GENE_MUTATION_COMMENTS"""
-        nodes = root.xpath(GENE_MUTATION_COMMENTS_XPATH)
+        nodes = root.xpath(self.GENE_MUTATION_COMMENTS_XPATH)
         genes = dict()
 
         # for every gene node
         for gene_node in nodes:
-            gene_name_node = self.select_unique_single_node(gene_node, GENE_MUTATION_COMMENTS_NAME_XPATH)
+            gene_name_node = self.select_unique_single_node(gene_node, self.GENE_MUTATION_COMMENTS_NAME_XPATH)
 
             # if no gene name throw an AsiParsingException
             if gene_name_node is None:
                 raise AsiParsingException("no gene name")
 
             # get the gene rules
-            gene_rule_nodes = gene_node.xpath(GENE_RULE_XPATH)
+            gene_rule_nodes = gene_node.xpath(self.GENE_RULE_XPATH)
 
             if len(gene_rule_nodes) == 0:
                 # no rules for the current gene
@@ -321,13 +327,13 @@ class XmlAsiTransformer:
             gene_rules = self.parse_rules(gene_rule_nodes, levels, comments, global_range)
 
             # for every gene rule
-            genes[gene_name] = gene_rules
+            genes[gene_name] = Gene(name=gene_name, gene_rules=gene_rules)
 
         return genes
 
     def is_unique_defined_drug(self, drug_name, drug_classes):
         """Search for every class if the drug is already associated with a different one"""
-        for class_name in drug_classes:
+        for class_name in set(drug_classes.keys()):
             # get the DrugClass
             drug_class = drug_classes.get(class_name)
             # get the set of drugs
