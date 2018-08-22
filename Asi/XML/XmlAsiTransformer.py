@@ -373,7 +373,7 @@ class XmlAsiTransformer:
         return None if len(nodes) == 0 else nodes[0]
 
     def get_required_definition(self, definitions, key):
-        obj = definitions.get(str(key)).text.strip()
+        obj = definitions.get(key)
         if obj is None:
             raise AsiParsingException("required definition: " + key + " does not exist.")
         # return the new Definition

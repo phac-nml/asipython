@@ -37,7 +37,7 @@ class Drug:
 
     def evaluate(self, mutations, comparator):
         """Requires a list of mutations and a MutationComparator"""
-        evaluated_conditions = list()
+        evaluated_conditions = []
         for rule in self.drug_rules:
             try:
                 evaluated_conditions.append(rule.evaluate(mutations, comparator))

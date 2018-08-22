@@ -16,6 +16,8 @@ specific language governing permissions and limitations under the License.
 """
 
 from Asi.Definition.LevelDefinitionComparator import LevelDefinitionComparator
+from Asi.Definition.LevelDefinition import LevelDefinition
+from Asi.Definition.CommentDefinition import CommentDefinition
 
 
 class EvaluatedDrug(object):
@@ -37,9 +39,9 @@ class EvaluatedDrug(object):
             definitions = evaluated_condition.get_definitions()
 
             for definition in definitions:
-                if hasattr(definition, 'order'):  # level definition
+                if isinstance(definition, LevelDefinition):  # level definition
                     self.level_definitions.add(definition)
-                elif hasattr(definition, 'sort'):  # comment definition
+                elif isinstance(definition, CommentDefinition):  # comment definition
                     self.comment_definitions.add(definition)
                 else:
                     raise TypeError("Unexpected attribute found for " +

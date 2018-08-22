@@ -79,3 +79,23 @@ class TestDrug:
             raise exc
         finally:
             fd.close()
+
+    def test_defined_drug_within_different_drug_classes(self):
+        """DLV drug defined in NNRTI and NRTI drug classes"""
+        try:
+            transformer = XmlAsiTransformer(False)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_definedDrugWithinDifferentDrugClasses.xml"), "r")
+            transformer.transform(fd)
+        except AsiParsingException as e:
+            print("testDefinedDrugWithinDifferentDrugClasses:\n\t%s" % str(e))
+            try:
+                actual_err_message = str(e).index("has been defined for more than one drug class")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "has been defined for more than one drug class\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("testDefinedDrugWithinSiddwewnrDrugClasses ex:%s" % str(exc))
+            raise exc
+        finally:
+            fd.close()

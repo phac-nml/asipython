@@ -20,12 +20,12 @@ class CommentDefinition(object):
     FORMAT = "{id: %s, text: %s, sort: %d}"
 
     def __init__(self, identifier, text, sort=None):
-        self.id = identifier
+        self.identifier = identifier
         self.text = text
         self.sort = sort
 
     def get_id(self):
-        return self.id
+        return self.identifier
 
     def get_text(self):
         return self.text
@@ -37,4 +37,4 @@ class CommentDefinition(object):
         return self.text
 
     def __str__(self):
-        return self.FORMAT % (self.id, self.text, self.sort)
+        return self.FORMAT % (self.identifier, self.text, self.sort)
