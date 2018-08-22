@@ -95,7 +95,27 @@ class TestDrug:
                                 "has been defined for more than one drug class\n" +
                                 "Instead received:%s" % (str(e)))
         except Exception as exc:
-            print("testDefinedDrugWithinSiddwewnrDrugClasses ex:%s" % str(exc))
+            print("testDefinedDrugWithinDifferentDrugClasses ex:%s" % str(exc))
+            raise exc
+        finally:
+            fd.close()
+
+    def test_undefined_drug(self):
+        """DLV drug is not defined under a DRUG tag"""
+        try:
+            transformer = XmlAsiTransformer(False)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_undefinedDrug.xml"), "r")
+            transformer.transform(fd)
+        except AsiParsingException as e:
+            print("testUndefinedDrug\n\t" + str(e))
+            try:
+                actual_err_message = str(e).index("has not been defined as a drug")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "has not been defined as a drug\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("ex:" + str(exc))
             raise exc
         finally:
             fd.close()
