@@ -282,7 +282,7 @@ class XmlAsiTransformer:
 
         if len(tag_defined_drug_names) > 0:
             raise AsiParsingException("The following drugs have not been associated" +
-                                      "with a drug class: " +
+                                      " with a drug class: " +
                                       str(tag_defined_drug_names))
 
         return drug_classes

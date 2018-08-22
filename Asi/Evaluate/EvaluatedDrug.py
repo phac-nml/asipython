@@ -39,12 +39,12 @@ class EvaluatedDrug(object):
             for definition in definitions:
                 if hasattr(definition, 'order'):  # level definition
                     self.level_definitions.add(definition)
-                elif hasattr(definition, 'identifier'):  # comment definition
+                elif hasattr(definition, 'sort'):  # comment definition
                     self.comment_definitions.add(definition)
                 else:
-                    raise TypeError("Unexpected attribute found for %s expected " +
-                                    "to be of type LevelDefinition or CommentDefinition"
-                                    % str(definition))
+                    raise TypeError("Unexpected attribute found for " +
+                                    str(definition) +
+                                    "expected to be of type LevelDefinition or CommentDefinition")
 
     def get_evaluated_conditions(self):
         return self.evaluated_conditions

@@ -59,3 +59,23 @@ class TestDrug:
             raise exc
         finally:
             fd.close()
+
+    def test_undefined_drug_within_a_drug_class(self):
+        """DLV drug is missing from NNRTI drug class (the drug is associated with no drug class)"""
+        try:
+            transformer = XmlAsiTransformer(False)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_undefinedDrugWithinDrugClass.xml"), "r")
+            transformer.transform(fd)
+        except AsiParsingException as e:
+            print("testUndefinedDrugWithinADrugClass:\n\t%s" % str(e))
+            try:
+                actual_err_message = str(e).index("The following drugs have not been associated with a drug class")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "The following drugs have not been associated with a drug class\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("testUndefinedDrugWithinADrugClass ex:%s" % str(exc))
+            raise exc
+        finally:
+            fd.close()
