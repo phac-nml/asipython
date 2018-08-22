@@ -24,7 +24,7 @@ class Gene(object):
     def __init__(self, name, drug_classes=None, gene_rules=None):
         self.name = name
 
-        if drug_classes==None and gene_rules==None:
+        if drug_classes is None and gene_rules is None:
             raise Exception("User must pass as an argument at least one of" +
                             " drug_classes or gene_rules.")
 
