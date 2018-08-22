@@ -119,6 +119,15 @@ class XmlAsiTransformer:
 
         genes = {}
 
+        for gene_name in gene_names:
+            # for every gene
+            gene_drug_class = gene_evaluated_drugs.get(gene_name)
+            gene_mutation_comments = gene_evaluated_mutation_comments.get(gene_name)
+            if gene_mutation_comments is None:
+                genes[gene_name] = Gene(gene_name, gene_drug_class.get_drug_classes(), list())
+            else:
+                genes[gene_name] = Gene(gene_name, gene_drug_class.get_drug_classes(), gene_mutation_comments.get_rules())
+
         return genes
 
     def create_level_dict(self, root):
@@ -228,7 +237,33 @@ class XmlAsiTransformer:
         tag_defined_drug_names.update(set(drugs.keys()))
 
         drug_classes = dict()
-        # TODO
+        nodes = root.xpath(DRUG_CLASS_XPATH)
+        # for every drug class node create a DrugClass object
+        for drug_class_node in nodes:
+            class_name = self.select_unique_single_node(drug_class_node, DRUG_CLASS_NAME_XPATH).text.strip()
+            drug_list_str = self.select_unique_single_node(drug_class_node, DRUG_CLASS_DRUGLIST_XPATH).text.strip()
+            drug_names = drug_list_str.split(",")
+
+            drug_list = set()
+            for i in range(0, len(drug_names)):
+                drug = drugs.get(drug_names[i].strip())
+                if drug is None:
+                    raise AsiParsingException(drug_names[i].strip() + " has not been defined as a drug.")
+                if not self.is_unique_defined_drug(drug.get_drug_name(), drug_classes):
+                    raise AsiParsingException("The drug: " + drug.get_drug_name() + "; has been defined for more than one drug class.")
+
+                # remove the valid drug from the drug list defined in DRUG tags
+                tag_defined_drug_names.remove(drug.get_drug_name())
+                drug_list.add(drug)
+
+            drug_classes[class_name] = drug_list
+
+        # some drugs defined in DRUG tags are not associated with any class
+
+        if len(tag_defined_drug_names) > 0:
+            raise AsiParsingException("The following drugs have not been associated with a drug class: " + str(tag_defined_drug_names))
+
+
         return drug_classes
 
     def parse_genes(self, root, drug_classes):
@@ -289,6 +324,20 @@ class XmlAsiTransformer:
             genes[gene_name] = gene_rules
 
         return genes
+
+    def is_unique_defined_drug(self, drug_name, drug_classes):
+        """Search for every class if the drug is already associated with a different one"""
+        for class_name in drug_classes:
+            # get the DrugClass
+            drug_class = drug_classes.get(class_name)
+            # get the set of drugs
+            drug_list = drug_class.get_drugs()
+            # for every drug of the class
+            for drug in drug_list:
+                if drug_name == drug.get_drug_name():
+                    return False
+
+        return True
 
     def select_unique_single_node(self, parent, xpath):
         nodes = parent.xpath(xpath)
