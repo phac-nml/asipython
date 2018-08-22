@@ -28,7 +28,7 @@ class TestDrug:
     @classmethod
     def setup_class(cls):
         cls.strict_comparison = False
-        cls.validate_xml = False
+        cls.validate_xml = True
         cls.gene_name = "RT"
         cls.mutation_comparator = StringMutationComparator(cls.strict_comparison)
         cls.mutation_list = "41L,75MA,98G,100I,90M"
@@ -41,4 +41,21 @@ class TestDrug:
         if not comparator.are_mutations_valid(cls.mutations):
             raise Exception("Mutations are not valid %s" % cls.mutations_string)
 
-    
+    def test_missing_drug_name(self):
+        try:
+            transformer = XmlAsiTransformer(self.validate_xml)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_missingDrugName.xml"), "r")
+            transformer.transform(fd)
+        except AsiParsingException as e:
+            print("testMissingDrugName:\n\t%s" % str(e))
+            try:
+                actual_err_message = str(e).index("Not a Stanford resistance analysis XML file")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "Not a Stanford resistance analysis XML file\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("ex:%s" % str(exc))
+            raise exc
+        finally:
+            fd.close()
