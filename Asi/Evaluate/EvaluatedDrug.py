@@ -44,7 +44,7 @@ class EvaluatedDrug(object):
                 else:
                     raise TypeError("Unexpected attribute found for %s expected " +
                                     "to be of type LevelDefinition or CommentDefinition"
-                                    % definition)
+                                    % str(definition))
 
     def get_evaluated_conditions(self):
         return self.evaluated_conditions

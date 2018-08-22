@@ -210,3 +210,28 @@ class TestRule:
             print("the action does not support a result of type:\n\t" + str(e))
             actual_err_message = str(e).index("does not support a result of type:")
             assert True == (actual_err_message > -1)
+
+    def test_result_out_of_range(self):
+        """for ETR drug, drug class NNRTI, for the second rule, which is a boolean condition the actions contain a SCORERANGE action"""
+        gene_dict = dict()
+        transformer = None
+
+        try:
+            transformer = XmlAsiTransformer(False)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_evaluationExceptionScoreRangeAction.xml"), "r")
+            gene_dict = transformer.transform(fd)
+        except AsiParsingException as e:
+            print("testInvalidRuleActionType AsiParsingException:" + str(e))
+            raise e
+        except Exception as exc:
+            print("testInvalidRuleActionType Exception:" + str(exc))
+            raise exc
+
+        gene = gene_dict.get(self.gene_name)
+
+        try:
+            evaluated_gene = gene.evaluate(self.mutations, self.mutation_comparator)
+        except AsiEvaluationException as e:
+            print("No score range has been defined for a score of\n\t" + str(e))
+            actual_err_message = str(e).index("No score range has been defined for a score of:")
+            assert True == (actual_err_message > -1)
