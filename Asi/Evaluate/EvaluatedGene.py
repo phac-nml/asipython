@@ -32,7 +32,7 @@ class EvaluatedGene(object):
         """Requires a List"""
         self.gene_evaluated_conditions = gene_evaluated_conditions
         for evaluated_condition in gene_evaluated_conditions:
-            self.game_scored_mutations.update(
+            self.gene_scored_mutations.update(
                 evaluated_condition.get_evaluator().get_scored_mutations())
             self.gene_comment_definitions.update(evaluated_condition.get_definitions())
 

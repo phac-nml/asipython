@@ -119,3 +119,19 @@ class TestDrug:
             raise exc
         finally:
             fd.close()
+
+    def test_drug_without_any_rule(self):
+        """DLV drug does not have defined any rule"""
+        try:
+            transformer = XmlAsiTransformer(False)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_drugWithoutAnyRule.xml"), "r")
+            gene_dict = transformer.transform(fd)
+            gene = gene_dict.get(self.gene_name)
+            evaluated_gene = gene.evaluate(self.mutations, self.mutation_comparator)
+            print("evaluated gene:" + str(evaluated_gene))
+        except AsiEvaluationException as e:
+            print("no rules for this drug\n\t" + str(e))
+            raise e
+        except Exception as exc:
+            print("testDrugWtihoutAnyRule ex:" + str(exc))
+            raise exc
