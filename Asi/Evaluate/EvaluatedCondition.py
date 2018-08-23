@@ -18,7 +18,7 @@ specific language governing permissions and limitations under the License.
 
 class EvaluatedCondition(object):
 
-    FORMAT = "%sstatement: %s,%sdefinitions: %s}"
+    FORMAT = "EvaluatedCondition{%sstatement: %s,%sdefinitions: %s}"
 
     def __init__(self, rule_condition, evaluator):
         """Requires a RuleCondition and AsiGrammarAdapter object"""
@@ -41,6 +41,12 @@ class EvaluatedCondition(object):
         return self.definitions
 
     def __str__(self):
+        return self.FORMAT % ("\n\t\t",
+                              self.rule_condition,
+                              "\n\t\t",
+                              self.definitions)
+
+    def __repr__(self):
         return self.FORMAT % ("\n\t\t",
                               self.rule_condition,
                               "\n\t\t",

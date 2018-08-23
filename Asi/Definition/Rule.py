@@ -66,3 +66,6 @@ class Rule:
 
     def __str__(self):
         return str(self.condition)
+
+    def __repr__(self):
+        return "Rule{%s}" % str(self.condition)

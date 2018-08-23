@@ -53,7 +53,10 @@ class Gene:
         return self.gene_rules
 
     def __str__(self):
-        return self.name
+        return "Gene{%s}" % self.name
+
+    def __repr__(self):
+        return "Gene{%s}" % self.name
 
     # pylint: disable=try-except-raise
     def evaluate(self, mutations, comparator):

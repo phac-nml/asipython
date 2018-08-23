@@ -45,6 +45,9 @@ class RangeValue:
     def __str__(self):
         return "%f to %f => %i" % (self.min, self.max, self.level.get_order())
 
+    def __repr__(self):
+        return "RangeValue{%f to %f => %i}" % (self.min, self.max, self.level.get_order())
+
     # pylint: disable=try-except-raise
     def is_overlapping(self, other):
         """Requires RangeValue other"""

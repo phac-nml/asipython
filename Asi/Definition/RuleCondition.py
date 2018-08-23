@@ -46,4 +46,7 @@ class RuleCondition:
         return EvaluatedCondition(self, adapter)
 
     def __str__(self):
-        return self.statement
+        return "RuleCondition{%s}" % self.statement
+
+    def __repr__(self):
+        return "RuleCondition{%s}" % self.statement

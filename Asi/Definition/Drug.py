@@ -51,4 +51,7 @@ class Drug:
         return EvaluatedDrug(self, evaluated_conditions)
 
     def __str__(self):
-        return self.name
+        return "Drug{" + self.name + "}"
+
+    def __repr__(self):
+        return "Drug{" + self.name + "}"

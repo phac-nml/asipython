@@ -19,7 +19,7 @@ specific language governing permissions and limitations under the License.
 class CommentDefinition:
     """CommentDefinition"""
 
-    FORMAT = "{id: %s, text: %s, sort: %d}"
+    FORMAT = "CommentDefinition{id: %s, text: %s, sort: %d}"
 
     def __init__(self, identifier, text, sort=None):
         """Params: str identifier, str text, int sort"""
@@ -44,4 +44,7 @@ class CommentDefinition:
         return self.text
 
     def __str__(self):
+        return self.FORMAT % (self.identifier, self.text, self.sort)
+
+    def __repr__(self):
         return self.FORMAT % (self.identifier, self.text, self.sort)

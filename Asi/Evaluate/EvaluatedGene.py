@@ -18,7 +18,7 @@ specific language governing permissions and limitations under the License.
 
 class EvaluatedGene(object):
 
-    FORMAT = "{Gene: %s, Evaluated Drug Classes: %s, Gene Comments: %s}"
+    FORMAT = "EvaluatedGene{Gene: %s, Evaluated Drug Classes: %s, Gene Comments: %s}"
 
     def __init__(self, gene, gene_evaluated_conditions, evaluated_drug_classes):
         """Requires a Gene and two Lists"""
@@ -52,4 +52,7 @@ class EvaluatedGene(object):
         return self.evaluated_drug_classes
 
     def __str__(self):
+        return self.FORMAT % (self.gene, self.evaluated_drug_classes, self.gene_comment_definitions)
+
+    def __repr__(self):
         return self.FORMAT % (self.gene, self.evaluated_drug_classes, self.gene_comment_definitions)

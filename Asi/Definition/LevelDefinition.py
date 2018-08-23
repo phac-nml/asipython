@@ -19,7 +19,7 @@ specific language governing permissions and limitations under the License.
 class LevelDefinition:
     """LevelDefinition"""
 
-    FORMAT = "{order: %i, text: %s, sir: %s}"
+    FORMAT = "LevelDefinition{order: %i, text: %s, sir: %s}"
 
     def __init__(self, order, text, sir):
         """Params: int order, str text, str sir"""
@@ -44,4 +44,7 @@ class LevelDefinition:
         return self.text
 
     def __str__(self):
+        return self.FORMAT % (self.order, self.text, self.sir)
+
+    def __repr__(self):
         return self.FORMAT % (self.order, self.text, self.sir)

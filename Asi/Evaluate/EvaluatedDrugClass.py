@@ -18,7 +18,7 @@ specific language governing permissions and limitations under the License.
 
 class EvaluatedDrugClass(object):
 
-    FORMAT = "{Drug Class: %s, Evaluated Drugs: %s}"
+    FORMAT = "EvaluatedDrugClass{Drug Class: %s, Evaluated Drugs: %s}"
 
     def __init__(self, drug_class, evaluated_drugs):
         self.drug_class = drug_class
@@ -31,4 +31,7 @@ class EvaluatedDrugClass(object):
         return self.evaluated_drugs
 
     def __str__(self):
+        return self.FORMAT % (self.drug_class, self.evaluated_drugs)
+
+    def __repr__(self):
         return self.FORMAT % (self.drug_class, self.evaluated_drugs)

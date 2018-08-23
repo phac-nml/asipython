@@ -36,7 +36,10 @@ class DrugClass:
         return self.drugs
 
     def __str__(self):
-        return self.name
+        return "DrugClass{%s}" % self.name
+
+    def __repr__(self):
+        return "DrugClass{%s}" % self.name
 
     # pylint: disable=try-except-raise
     def evaluate(self, mutations, comparator):
