@@ -219,7 +219,7 @@ class AsiGrammarAdapter(DepthFirstAdapter):
 
         for _ in range(0, num_items):
             value = self.stack.pop()
-            print(value)
+            # print(value)
 
             if not math.isnan(value):
                 summation += value
