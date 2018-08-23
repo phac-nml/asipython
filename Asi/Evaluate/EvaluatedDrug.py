@@ -22,7 +22,7 @@ from Asi.Definition.CommentDefinition import CommentDefinition
 
 class EvaluatedDrug(object):
 
-    FORMAT = "{Drug: %s, Scored Mutations: %s, Level: %s, Comments: %s}"
+    FORMAT = "EvaluatedDrug{Drug: %s, Scored Mutations: %s, Level: %s, Comments: %s}"
 
     def __init__(self, drug, evaluated_conditions):
         self.drug = drug
@@ -52,8 +52,10 @@ class EvaluatedDrug(object):
         return self.evaluated_conditions
 
     def get_highest_level_definition(self):
-        return max(self.level_definitions, key=LevelDefinitionComparator.compare()) \
-                   if len(self.level_definitions) > 0 else None
+        if len(self.level_definitions) > 1:
+            return max(self.level_definitions, key=LevelDefinitionComparator.compare())
+        else:
+            return None
 
     def get_comment_definitions(self):
         return self.comment_definitions
@@ -68,6 +70,13 @@ class EvaluatedDrug(object):
         return self.drug
 
     def __str__(self):
+        highest_lev_def = self.get_highest_level_definition()
+        return self.FORMAT % (self.drug,
+                              self.scored_mutations,
+                              str(highest_lev_def) if highest_lev_def is not None else "",
+                              self.comment_definitions)
+
+    def __repr__(self):
         highest_lev_def = self.get_highest_level_definition()
         return self.FORMAT % (self.drug,
                               self.scored_mutations,
