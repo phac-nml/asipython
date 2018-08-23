@@ -65,7 +65,7 @@ class Rule:
         return score_range_action_count > 1
 
     def __str__(self):
-        return str(self.condition)
+        return "Rule{%s}" % str(self.condition)
 
     def __repr__(self):
         return "Rule{%s}" % str(self.condition)
