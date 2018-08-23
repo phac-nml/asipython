@@ -155,7 +155,7 @@ class TestRule:
             try:
                 evaluatedGene = gene.evaluate(self.mutations, self.mutation_comparator)
             except AsiEvaluationException as e:
-                print("the action does not support a result of type:" + str(e))
+                print("the action does not support a result of type:\n\t" + str(e))
                 try:
                     actual_err_message = str(e).index("does not support a result of type")
                 except ValueError as v:
