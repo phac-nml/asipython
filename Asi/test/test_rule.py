@@ -88,6 +88,44 @@ class TestRule:
         finally:
             fd.close()
 
+    def test_missing_required_rule_elements_alg_info(self):
+        """Test when a rule is missing the condition for DLV drug. Using get_algorithm_info"""
+        try:
+            transformer = XmlAsiTransformer(self.validate_xml)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_missingCondition.xml"), "r")
+            transformer.get_algorithm_info(fd)
+        except AsiParsingException as e:
+            print("CONDITION tag is a required element:\n\t%s" % str(e))
+            try:
+                actual_err_message = str(e).index("Not a Stanford resistance analysis XML file")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "Not a Stanford resistance analysis XML file\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("ex:%s" % str(exc))
+            raise exc
+        finally:
+            fd.close()
+
+        try:
+            transformer = XmlAsiTransformer(self.validate_xml)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_missingActions.xml"), "r")
+            transformer.get_algorithm_info(fd)
+        except AsiParsingException as e:
+            print("ACTIONS tag is a required element:\n\t%s" % str(e))
+            try:
+                actual_err_message = str(e).index("Not a Stanford resistance analysis XML file")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "Not a Stanford resistance analysis XML file\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("ex:%s" % str(exc))
+            raise exc
+        finally:
+            fd.close()
+
     def test_required_global_range(self):
         try:
             transformer = XmlAsiTransformer(False)

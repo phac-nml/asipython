@@ -62,9 +62,10 @@ class XmlAsiTransformer:
     DRUG_NAME_XPATH = "NAME"
     DRUG_FULLNAME_XPATH = "FULLNAME"
 
-    ALGORITHM_NAME_XPATH = "/ALGORITHM/ALGNAME"
-    ALGORITHM_VERSION_XPATH = "/ALGORITHM/ALGVERSION"
-    ALGORITHM_DATE_XPATH = "/ALGORITHM/ALGDATE"
+    ALGORITHM_XPATH = "/ALGORITHM"
+    ALGORITHM_NAME_XPATH = "ALGNAME"
+    ALGORITHM_VERSION_XPATH = "ALGVERSION"
+    ALGORITHM_DATE_XPATH = "ALGDATE"
 
     RULE_XPATH = "RULE"
     RULE_CONDITION_XPATH = "CONDITION"
@@ -418,3 +419,188 @@ class XmlAsiTransformer:
             raise AsiParsingException("required definition: " + key + " does not exist.")
         # return the new Definition
         return obj
+
+    def get_algorithm_info(self, asi_xml_file):
+        """Return the algoirthm info"""
+        root = etree.parse(asi_xml_file)
+        if self.validate_xml:
+            schema = root.docinfo.internalDTD.system_url
+            dtd = None
+
+            module_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            if schema.split('/')[-1] == 'ASI.dtd':
+                dtd = etree.DTD(open(os.path.join(module_path, "ASI.dtd")))
+            elif schema.split('/')[-1] == 'ASI2.dtd':
+                dtd = etree.DTD(open(os.path.join(module_path, "ASI2.dtd")))
+            elif schema.split('/')[-1] == 'ASI2.1.dtd':
+                dtd = etree.DTD(open(os.path.join(module_path, "ASI2.1.dtd")))
+
+            if dtd is None or not dtd.validate(root):
+                raise AsiParsingException("Not a Stanford resistance analysis XML file")
+
+        alg_dict = {}
+        alg_name_version_date = self.parse_for_alg_name_version_date(root)
+        alg_dict["ALGNAME_ALGVERSION_ALGDATE"] = alg_name_version_date
+        alg_dict["ALGNAME_ALGVERSION"] = alg_name_version_date
+
+        # get the lowest levelDefinition as defined when the order = 1
+        lowest_level_definition = self.create_level_dict(root).get("1")
+        lowest_level_original_sir = {}
+        lowest_level_original_sir["ORIGINAL"] = lowest_level_definition.get_text()
+        lowest_level_original_sir["SIR"] = lowest_level_definition.get_sir()
+        alg_dict["ORDER1_ORIGINAL_SIR"] = lowest_level_original_sir
+
+        drug_and_full_names = self.parse_for_drug_and_full_names(root)
+        alg_dict["DRUG_FULLNAME"] = drug_and_full_names
+
+        drug_class_and_drugs = self.parse_for_drug_classes_and_drugs(root, drug_and_full_names)
+        alg_dict["DRUGCLASS_DRUGLIST"] = drug_class_and_drugs
+
+        gene_and_drug_classes = self.parse_for_gene_and_drug_classes(root, drug_class_and_drugs)
+        alg_dict["GENE_DRUGCLASSLIST"] = gene_and_drug_classes
+
+        return alg_dict
+
+    def parse_for_alg_name_version_date(self, root):
+        """Traverse through the list of drugs and add them to the list
+           Returns: dict with algorithm name, version, and date
+           Throws: AsiParsingException"""
+        alg_info = {}
+        alg_node = self.select_unique_single_node(root, self.ALGORITHM_XPATH)
+        alg_name = alg_node.find(self.ALGORITHM_NAME_XPATH).text.strip()
+        alg_version = alg_node.find(self.ALGORITHM_VERSION_XPATH).text.strip()
+
+        # must check becaues algorithm version was added later on
+        alg_date = "NA"
+        if alg_node.find(self.ALGORITHM_DATE_XPATH) is not None:
+            alg_date = alg_node.find(self.ALGORITHM_DATE_XPATH).text.strip()
+
+        alg_info["ALGNAME"] = alg_name
+        alg_info["ALGVERSION"] = alg_version
+        alg_info["ALGDATE"] = alg_date
+
+        return alg_info
+
+    def parse_for_drug_and_full_names(self, root):
+        """Traverse through the list of Drugs and add them to the list
+        Derived from parse_drugs() above; except that for efficiency we don't want the rules.
+        Params: root, dict levels, dict comments, list global_range.
+        Returns: a dict[drug_name] = drug_full_name, where drug_name and drug_full_name
+        are strings
+        Throws: AsiParsingException"""
+        drugs = {}
+
+        drug_nodes = root.xpath(self.DRUG_XPATH)
+        for drug in drug_nodes:
+            drug_name = drug.find(self.DRUG_NAME_XPATH).text.strip()
+            drug_full_name = None
+            if drug.find(self.DRUG_FULLNAME_XPATH) is not None:
+                drug_full_name = drug.find(self.DRUG_FULLNAME_XPATH).text.strip()
+
+            drugs[drug_name] = drug_full_name
+
+        return drugs
+
+    def parse_for_drug_classes_and_drugs(self, root, drugs):
+        """Derived from parse_drug_classes() above; except that for efficiency
+           we don't want the rules and thus no Drug objects
+           Params: root, dict drugs"""
+        tag_defined_drug_names = set()
+        tag_defined_drug_names.update(set(drugs.keys()))
+
+        drug_classes = {}
+        nodes = root.xpath(self.DRUG_CLASS_XPATH)
+
+        # for every drug class node create a DrugClass object
+        for drug_class_node in nodes:
+            class_name = self.select_unique_single_node(drug_class_node,
+                                                        self.DRUG_CLASS_NAME_XPATH).text.strip()
+            drug_list_str = \
+                self.select_unique_single_node(drug_class_node,
+                                               self.DRUG_CLASS_DRUGLIST_XPATH).text.strip()
+            drug_names = drug_list_str.split(",")
+
+            drug_list = set()
+            for element in drug_names:
+                drug_name = element.strip()
+                # check if the drug_name is in dict drugs
+                if drug_name not in drugs:
+                    raise AsiParsingException(drug_name +
+                                              " has not been defined as a drug.")
+                if not self.is_unique_defined_drug_2(drug_name, drug_classes):
+                    raise AsiParsingException("The drug: " +
+                                              drug_name +
+                                              "; has been defined for more than one drug class.")
+
+                # remove the valid drug from the drug list defined in DRUG tags
+                tag_defined_drug_names.remove(drug_name)
+                drug_list.add(drug_name)
+
+            drug_classes[class_name] = drug_list
+
+        # some drugs defined in DRUG tags are not associated with any class
+
+        if tag_defined_drug_names:
+            raise AsiParsingException("The following drugs have not been associated" +
+                                      " with a drug class: " +
+                                      str(tag_defined_drug_names))
+
+        return drug_classes
+
+    # pylint: disable=no-self-use
+    def is_unique_defined_drug_2(self, in_drug_name, drug_classes):
+        """Search for every class if the drug is already associated with a different one
+           Derived from is_unique_defined_drug above; except that for efficiency we don't
+           want the rules and thus no Drug objects
+           Params: str drug_name, dict drug_classes
+           Returns: bool is_unique"""
+        for class_name in set(drug_classes.keys()):
+            # get the set of drugs
+            drug_list = drug_classes.get(class_name)
+            # for every drug of the class
+            if in_drug_name in drug_list:
+                return False
+
+        return True
+
+    def parse_for_gene_and_drug_classes(self, root, drug_classes):
+        """Parses genes
+           Derived from parse_genes() above; except that for efficiency we don't
+           want the rules and thus no Drug objects.
+           Params: root
+           Returns: dict drug_classes"""
+        nodes = root.xpath(self.GENE_DEFINITION_XPATH)
+        if nodes is None:
+            raise AsiParsingException("no gene specified")
+
+        genes = dict()
+
+        # Create a dict of genes. Every gene has associated a list of DrugClass objects
+        for node in nodes:
+            gene_name = node.find(self.GENE_DEFINITION_NAME_XPATH).text.strip()
+            # get the names of drug drug_classes
+            drug_class_list_nodes = node.xpath(self.GENE_DEFINITION_DRUGCLASSLIST_XPATH)
+            if len(drug_class_list_nodes) > 1:
+                raise AsiParsingException("duplicate node " +
+                                          self.GENE_DEFINITION_DRUGCLASSLIST_XPATH)
+
+            drug_class_set = set()
+            if len(drug_class_list_nodes) == 1:
+                drug_class_list_str = (drug_class_list_nodes[0]).text.strip()
+                if drug_class_list_str.strip() == "":
+                    raise AsiParsingException("drug class list missing for gene " + gene_name)
+                drug_class_names = drug_class_list_str.split(",")
+
+                # create the drug class list
+
+                for i, _ in enumerate(drug_class_names):
+                    drug_class_name = drug_class_names[i].strip()
+                    if drug_class_name in drug_classes:
+                        drug_class_set.add(drug_class_name)
+                    else:
+                        raise AsiParsingException(drug_class_name + " has not been defined as" +
+                                                  " a drug_class.")
+
+            genes[gene_name] = drug_class_set
+
+        return genes

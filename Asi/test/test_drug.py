@@ -42,10 +42,31 @@ class TestDrug:
             raise Exception("Mutations are not valid %s" % cls.mutations_string)
 
     def test_missing_drug_name(self):
+        """test_missing_drug_name"""
         try:
             transformer = XmlAsiTransformer(self.validate_xml)
             fd = open(os.path.join(self.module_path,"test/data/HIVDB_missingDrugName.xml"), "r")
             transformer.transform(fd)
+        except AsiParsingException as e:
+            print("testMissingDrugName:\n\t%s" % str(e))
+            try:
+                actual_err_message = str(e).index("Not a Stanford resistance analysis XML file")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "Not a Stanford resistance analysis XML file\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("ex:%s" % str(exc))
+            raise exc
+        finally:
+            fd.close()
+
+    def test_missing_drug_name_alg_info(self):
+        """Test missing drug name using get_algorithm_info"""
+        try:
+            transformer = XmlAsiTransformer(self.validate_xml)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_missingDrugName.xml"), "r")
+            transformer.get_algorithm_info(fd)
         except AsiParsingException as e:
             print("testMissingDrugName:\n\t%s" % str(e))
             try:
@@ -80,6 +101,26 @@ class TestDrug:
         finally:
             fd.close()
 
+    def test_undefined_drug_within_a_drug_class_alg_info(self):
+        """DLV drug is missing from NNRTI drug class (the drug is associated with no drug class). Using get_algorithm_info"""
+        try:
+            transformer = XmlAsiTransformer(False)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_undefinedDrugWithinDrugClass.xml"), "r")
+            transformer.get_algorithm_info(fd)
+        except AsiParsingException as e:
+            print("testUndefinedDrugWithinADrugClass:\n\t%s" % str(e))
+            try:
+                actual_err_message = str(e).index("The following drugs have not been associated with a drug class")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "The following drugs have not been associated with a drug class\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("testUndefinedDrugWithinADrugClass ex:%s" % str(exc))
+            raise exc
+        finally:
+            fd.close()
+
     def test_defined_drug_within_different_drug_classes(self):
         """DLV drug defined in NNRTI and NRTI drug classes"""
         try:
@@ -100,12 +141,52 @@ class TestDrug:
         finally:
             fd.close()
 
+    def test_defined_drug_within_different_drug_classes_alg_info(self):
+        """DLV drug defined in NNRTI and NRTI drug classes. Using get_algorithm_info"""
+        try:
+            transformer = XmlAsiTransformer(False)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_definedDrugWithinDifferentDrugClasses.xml"), "r")
+            transformer.get_algorithm_info(fd)
+        except AsiParsingException as e:
+            print("testDefinedDrugWithinDifferentDrugClasses:\n\t%s" % str(e))
+            try:
+                actual_err_message = str(e).index("has been defined for more than one drug class")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "has been defined for more than one drug class\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("testDefinedDrugWithinDifferentDrugClasses ex:%s" % str(exc))
+            raise exc
+        finally:
+            fd.close()
+
     def test_undefined_drug(self):
         """DLV drug is not defined under a DRUG tag"""
         try:
             transformer = XmlAsiTransformer(False)
             fd = open(os.path.join(self.module_path,"test/data/HIVDB_undefinedDrug.xml"), "r")
             transformer.transform(fd)
+        except AsiParsingException as e:
+            print("testUndefinedDrug\n\t" + str(e))
+            try:
+                actual_err_message = str(e).index("has not been defined as a drug")
+            except ValueError as v:
+                raise Exception("The following error message was expected: " +
+                                "has not been defined as a drug\n" +
+                                "Instead received:%s" % (str(e)))
+        except Exception as exc:
+            print("ex:" + str(exc))
+            raise exc
+        finally:
+            fd.close()
+
+    def test_undefined_drug_alg_info(self):
+        """DLV drug is not defined under a DRUG tag. Using get_algorithm_info"""
+        try:
+            transformer = XmlAsiTransformer(False)
+            fd = open(os.path.join(self.module_path,"test/data/HIVDB_undefinedDrug.xml"), "r")
+            transformer.get_algorithm_info(fd)
         except AsiParsingException as e:
             print("testUndefinedDrug\n\t" + str(e))
             try:
