@@ -21,6 +21,7 @@ from Asi.Definition.CommentDefinition import CommentDefinition
 
 
 class EvaluatedDrug(object):
+    """An evaluated Drug"""
 
     FORMAT = "EvaluatedDrug{Drug: %s, Scored Mutations: %s, Level: %s, Comments: %s}"
 

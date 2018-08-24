@@ -17,6 +17,7 @@ specific language governing permissions and limitations under the License.
 
 
 class EvaluatedDrugClass(object):
+    """An evaluated Drug Class"""
 
     FORMAT = "EvaluatedDrugClass{Drug Class: %s, Evaluated Drugs: %s}"
 

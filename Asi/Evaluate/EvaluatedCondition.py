@@ -17,6 +17,7 @@ specific language governing permissions and limitations under the License.
 
 
 class EvaluatedCondition(object):
+    """An evaluated RuleCondition"""
 
     FORMAT = "EvaluatedCondition{%sstatement: %s,%sdefinitions: %s}"
 
