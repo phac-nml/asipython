@@ -1,7 +1,7 @@
 """
 Copyright Government of Canada 2018
 
-Written by: Eric Enns, National Microbiology Laboratory, Public Health Agency of Canada
+Written by: Eric Enns and Matthew Fogel, National Microbiology Laboratory, Public Health Agency of Canada
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this work except in compliance with the License. You may obtain a copy of the
@@ -37,10 +37,9 @@ class RangeValue:
         """Returns: LevelDefinition level"""
         return self.level
 
-    # pylint: disable=chained-comparison
     def within_range(self, score):
         """Requires float score"""
-        return score >= self.min and score <= self.max
+        return self.min <= score <= self.max
 
     def __str__(self):
         return "%f to %f => %i" % (self.min, self.max, self.level.get_order())
@@ -48,11 +47,10 @@ class RangeValue:
     def __repr__(self):
         return "RangeValue{%f to %f => %i}" % (self.min, self.max, self.level.get_order())
 
-    # pylint: disable=try-except-raise
     def is_overlapping(self, other):
         """Requires RangeValue other"""
         try:
             return (self.min <= other.min and other.min <= self.max) \
                    or (other.min <= self.min and self.min <= other.max)
-        except AttributeError:
-            raise
+        except AttributeError as att:
+            raise att

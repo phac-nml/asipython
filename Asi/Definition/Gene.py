@@ -58,21 +58,20 @@ class Gene:
     def __repr__(self):
         return "Gene{%s}" % self.name
 
-    # pylint: disable=try-except-raise
     def evaluate(self, mutations, comparator):
         """Requires a list of mutations and a MutationComparator"""
         evaluated_gene_rules = list()
         for gene_rule in self.gene_rules:
             try:
                 evaluated_gene_rules.append(gene_rule.evaluate(mutations, comparator))
-            except AsiEvaluationException:
-                raise
+            except AsiEvaluationException as exc:
+                raise exc
 
         evaluated_drug_classes = list()
         for drug_class in self.drug_classes:
             try:
                 evaluated_drug_classes.append(drug_class.evaluate(mutations, comparator))
-            except AsiEvaluationException:
-                raise
+            except AsiEvaluationException as exc:
+                raise exc
 
         return EvaluatedGene(self, evaluated_gene_rules, evaluated_drug_classes)

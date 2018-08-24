@@ -41,13 +41,12 @@ class DrugClass:
     def __repr__(self):
         return "DrugClass{%s}" % self.name
 
-    # pylint: disable=try-except-raise
     def evaluate(self, mutations, comparator):
         """Requires a list of mutations and a StringMutationComparator"""
         evaluated_drugs = list()
         for drug in self.drugs:
             try:
                 evaluated_drugs.append(drug.evaluate(mutations, comparator))
-            except AsiEvaluationException:
-                raise
+            except AsiEvaluationException as exc:
+                raise exc
         return EvaluatedDrugClass(self, evaluated_drugs)
