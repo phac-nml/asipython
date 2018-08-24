@@ -25,6 +25,7 @@ class EvaluatedDrug(object):
     FORMAT = "EvaluatedDrug{Drug: %s, Scored Mutations: %s, Level: %s, Comments: %s}"
 
     def __init__(self, drug, evaluated_conditions):
+        """Requires Drug drug, list evaluated_conditions"""
         self.drug = drug
         self.scored_mutations = set()
         self.level_definitions = set()
@@ -32,6 +33,7 @@ class EvaluatedDrug(object):
         self.parse_evaluated_conditions(evaluated_conditions)
 
     def parse_evaluated_conditions(self, evaluated_conditions):
+        """Parse list evaluated_conditions"""
         self.evaluated_conditions = evaluated_conditions
         for evaluated_condition in evaluated_conditions:
 
@@ -49,24 +51,30 @@ class EvaluatedDrug(object):
                                     "expected to be of type LevelDefinition or CommentDefinition")
 
     def get_evaluated_conditions(self):
+        """Returns: list evaluated_conditions"""
         return self.evaluated_conditions
 
     def get_highest_level_definition(self):
+        """Returns: highest level definition in set level_definitions"""
         if len(self.level_definitions) > 1:
             return max(self.level_definitions, key=LevelDefinitionComparator.compare())
         else:
             return None
 
     def get_comment_definitions(self):
+        """Returns: set comment_definitions"""
         return self.comment_definitions
 
     def get_level_definitions(self):
+        """Returns: set level_definitions"""
         return self.level_definitions
 
     def get_scored_mutations(self):
+        """Returns: set scored_mutations"""
         return self.scored_mutations
 
     def get_drug(self):
+        """Returns: Drug drug"""
         return self.drug
 
     def __str__(self):

@@ -29,7 +29,7 @@ class EvaluatedGene(object):
         self.parese_gene_comment_definitions(gene_evaluated_conditions)
 
     def parese_gene_comment_definitions(self, gene_evaluated_conditions):
-        """Requires a List"""
+        """Requires a list of EvaluatedCondition objects"""
         self.gene_evaluated_conditions = gene_evaluated_conditions
         for evaluated_condition in gene_evaluated_conditions:
             self.gene_scored_mutations.update(
@@ -37,18 +37,23 @@ class EvaluatedGene(object):
             self.gene_comment_definitions.update(evaluated_condition.get_definitions())
 
     def get_gene_evaluated_conditions(self):
+        """Returns: list of EvaluatedCondition gene_evaluated_conditions"""
         return self.gene_evaluated_conditions
 
     def get_gene_scored_mutations(self):
+        """Returns: set gene_scored_mutations"""
         return self.gene_scored_mutations
 
     def get_gene_comment_definitions(self):
+        """Returns: set gene_comment_definitions"""
         return self.gene_comment_definitions
 
     def get_gene(self):
+        """Returns: Gene gene"""
         return self.gene
 
     def get_evaluated_drug_classes(self):
+        """Returns: list evaluated_drug_classes"""
         return self.evaluated_drug_classes
 
     def __str__(self):

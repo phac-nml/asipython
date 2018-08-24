@@ -21,13 +21,16 @@ class EvaluatedDrugClass(object):
     FORMAT = "EvaluatedDrugClass{Drug Class: %s, Evaluated Drugs: %s}"
 
     def __init__(self, drug_class, evaluated_drugs):
+        """Requires: DrugClass drug_class, list of EvaluatedDrugs evaluated_drugs"""
         self.drug_class = drug_class
         self.evaluated_drugs = evaluated_drugs
 
     def get_drug_class(self):
+        """Returns: DrugClass drug_class"""
         return self.drug_class
 
     def get_evaluated_drugs(self):
+        """Returns: list of EvaluatedDrugs evaluated_drugs"""
         return self.evaluated_drugs
 
     def __str__(self):

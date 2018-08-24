@@ -28,16 +28,20 @@ class EvaluatedCondition(object):
         self.definitions = set()
 
     def add_definition(self, definition):
+        """Add definitions to set of definitions"""
         if definition:
             self.definitions.add(definition)
 
     def get_rule_condition(self):
+        """Return RuleCondition rule_condition"""
         return self.rule_condition
 
     def get_evaluator(self):
+        """Return AsiGrammarAdapter evaluator"""
         return self.evaluator
 
     def get_definitions(self):
+        """Return set definitions"""
         return self.definitions
 
     def __str__(self):
