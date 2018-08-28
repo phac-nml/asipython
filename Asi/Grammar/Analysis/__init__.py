@@ -19,7 +19,7 @@ specific language governing permissions and limitations under the License.
 
 
 # pylint: disable=too-many-public-methods
-class Analysis(object):
+class Analysis:
     def __init__(self):
         self._in_ = None
         self._out_ = None
