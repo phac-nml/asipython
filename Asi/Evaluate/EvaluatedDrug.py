@@ -20,7 +20,7 @@ from Asi.Definition.LevelDefinition import LevelDefinition
 from Asi.Definition.CommentDefinition import CommentDefinition
 
 
-class EvaluatedDrug(object):
+class EvaluatedDrug():
     """An evaluated Drug"""
 
     FORMAT = "EvaluatedDrug{Drug: %s, Scored Mutations: %s, Level: %s, Comments: %s}"
@@ -58,9 +58,9 @@ class EvaluatedDrug(object):
     def get_highest_level_definition(self):
         """Returns: highest level definition in set level_definitions"""
         if len(self.level_definitions) > 1:
-            return max(self.level_definitions, key=LevelDefinitionComparator.compare())
-        else:
-            return None
+            return max(self.level_definitions, key=LevelDefinitionComparator.compare)
+
+        return None
 
     def get_comment_definitions(self):
         """Returns: set comment_definitions"""
