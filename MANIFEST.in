@@ -1,1 +1,3 @@
 include Asi/data/*
+include Asi/*.dtd
+

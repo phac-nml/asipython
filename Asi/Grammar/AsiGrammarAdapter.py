@@ -215,7 +215,7 @@ class AsiGrammarAdapter(DepthFirstAdapter):
 
     def sum_values_from_stack(self, num_items):
         """Pop off num_items from the Stack, then return the cumulative value"""
-        summation = 0
+        summation = float(0)
 
         for _ in range(0, num_items):
             value = self.stack.pop()
