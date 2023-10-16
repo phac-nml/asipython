@@ -29,14 +29,9 @@ def run_static_analysis():
 
 
 def run_unit_tests():
-    run(('nosetests',
-         '--exe',
-         '--with-doctest',
-         '--doctest-options', '+NORMALIZE_WHITESPACE',
-         '--with-coverage',
-         '--cover-tests',
-         '--cover-inclusive',
-         '--cover-package', PACKAGE_DIR,
+    run(('pytest',
+         '--doctest-modules',
+         '--cov', PACKAGE_DIR,
          PACKAGE_DIR))
 
 
