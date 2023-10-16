@@ -18,6 +18,7 @@ specific language governing permissions and limitations under the License.
 # pylint: disable=missing-docstring
 
 
+# pylint: disable=import-outside-toplevel
 def caller(num=1):
     import inspect
     return inspect.getouterframes(inspect.currentframe())[num][3]

@@ -22,7 +22,7 @@ from Asi.Evaluate.EvaluatedGene import EvaluatedGene
 class Gene:
     """Gene"""
 
-    def __init__(self, name, drug_classes=None, gene_rules=None):
+    def __init__(self, name, drug_classes=None, gene_rules=None, result_comment_drugs=None):
         """Params: str name, set drug_classes, list gene_rules"""
         self.name = name
 
@@ -39,6 +39,11 @@ class Gene:
             self.gene_rules = gene_rules
         else:
             self.gene_rules = list()
+
+        if result_comment_drugs:
+            self.result_comment_drugs = result_comment_drugs
+        else:
+            self.result_comment_drugs = dict()
 
     def get_name(self):
         """Returns: str name"""
@@ -74,4 +79,15 @@ class Gene:
             except AsiEvaluationException as exc:
                 raise exc
 
-        return EvaluatedGene(self, evaluated_gene_rules, evaluated_drug_classes)
+        evaluated_level_conditions = list()
+        for evaluated_drug_class in evaluated_drug_classes:
+            for evaluated_drug in evaluated_drug_class.get_evaluated_drugs():
+                result_comment_drug = self.result_comment_drugs.get(evaluated_drug
+                                                                    .get_drug()
+                                                                    .get_drug_name())
+                if result_comment_drug:
+                    result_level = evaluated_drug.get_highest_level_definition()
+                    evaluated_level_conditions.append(result_comment_drug.evaluate(result_level))
+
+        return EvaluatedGene(self, evaluated_gene_rules, evaluated_drug_classes,
+                             evaluated_level_conditions)

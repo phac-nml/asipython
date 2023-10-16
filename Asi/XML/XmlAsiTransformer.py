@@ -99,6 +99,8 @@ class XmlAsiTransformer:
                 dtd = etree.DTD(open(os.path.join(module_path, "ASI2.dtd")))
             elif schema.split('/')[-1] == 'ASI2.1.dtd':
                 dtd = etree.DTD(open(os.path.join(module_path, "ASI2.1.dtd")))
+            elif schema.split('/')[-1] == 'ASI2.2.dtd':
+                dtd = etree.DTD(open(os.path.join(module_path, "ASI2.2.dtd")))
 
             if dtd is None or not dtd.validate(root):
                 raise AsiParsingException("Not a Stanford resistance analysis XML file")
