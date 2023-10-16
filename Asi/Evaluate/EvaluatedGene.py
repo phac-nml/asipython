@@ -21,15 +21,17 @@ class EvaluatedGene():
 
     FORMAT = "EvaluatedGene{Gene: %s, Evaluated Drug Classes: %s, Gene Comments: %s}"
 
-    def __init__(self, gene, gene_evaluated_conditions, evaluated_drug_classes):
+    def __init__(self, gene, gene_evaluated_conditions, evaluated_drug_classes,
+                 evaluated_level_conditions):
         """Requires a Gene and two Lists"""
         self.gene = gene
         self.evaluated_drug_classes = evaluated_drug_classes
         self.gene_scored_mutations = set()
         self.gene_comment_definitions = set()
-        self.parese_gene_comment_definitions(gene_evaluated_conditions)
+        self.parse_gene_comment_definitions(gene_evaluated_conditions)
+        self.evaluated_drug_classes = evaluated_level_conditions
 
-    def parese_gene_comment_definitions(self, gene_evaluated_conditions):
+    def parse_gene_comment_definitions(self, gene_evaluated_conditions):
         """Requires a list of EvaluatedCondition objects"""
         self.gene_evaluated_conditions = gene_evaluated_conditions
         for evaluated_condition in gene_evaluated_conditions:
